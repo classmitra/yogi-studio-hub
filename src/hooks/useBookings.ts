@@ -3,19 +3,49 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
+interface BookingWithClass {
+  id: string;
+  user_id: string;
+  class_id: string;
+  booking_date: string;
+  booking_time: string;
+  status: string;
+  payment_status: string;
+  booking_reference: string;
+  special_requests?: string;
+  attended?: boolean;
+  created_at: string;
+  classes: {
+    title: string;
+    instructors: {
+      studio_name: string;
+    };
+  };
+}
+
 export const useBookings = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['bookings', user?.id],
-    queryFn: async () => {
+    queryFn: async (): Promise<BookingWithClass[]> => {
       if (!user?.id) return [];
       
       const { data, error } = await supabase
         .from('bookings')
         .select(`
-          *,
+          id,
+          user_id,
+          class_id,
+          booking_date,
+          booking_time,
+          status,
+          payment_status,
+          booking_reference,
+          special_requests,
+          attended,
+          created_at,
           classes!inner(
             title,
             instructors!inner(
@@ -27,7 +57,7 @@ export const useBookings = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data || [];
+      return data as BookingWithClass[] || [];
     },
     enabled: !!user?.id,
   });
