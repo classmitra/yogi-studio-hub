@@ -72,6 +72,8 @@ serve(async (req) => {
       logStep("Creating new customer");
     }
 
+    const origin = req.headers.get("origin") || "https://localhost:3000";
+
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -90,8 +92,8 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/studio/${classData.instructors.subdomain}`,
+      success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/payment-cancelled?return_url=${encodeURIComponent(`/studio/${classData.instructors.subdomain}`)}`,
       metadata: {
         class_id: classId,
         student_id: user.id,

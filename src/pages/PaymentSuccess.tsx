@@ -124,7 +124,7 @@ const PaymentSuccess = () => {
                 Browse More Classes
               </Button>
               <Button 
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/student-dashboard')}
                 className="flex-1"
               >
                 View My Bookings
