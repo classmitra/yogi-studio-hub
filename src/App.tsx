@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import StudioSetup from "./pages/StudioSetup";
 import Dashboard from "./pages/Dashboard";
 import Studio from "./pages/Studio";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 
 // Create QueryClient instance outside of component to prevent recreating on each render
@@ -37,6 +38,7 @@ const App: React.FC = () => {
               <Route path="/studio-setup" element={<StudioSetup />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/studio/:subdomain" element={<Studio />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { usePublicClasses } from '@/hooks/useClasses';
 import { useAuth } from '@/contexts/AuthContext';
-import { useBookings } from '@/hooks/useBookings';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { Clock, Users, Calendar, DollarSign, User } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -16,12 +16,12 @@ interface PublicStudioViewProps {
 const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
   const { classes, isLoading } = usePublicClasses(subdomain);
   const { user } = useAuth();
-  const { createBooking, isCreating } = useBookings();
   const { toast } = useToast();
+  const [bookingClass, setBookingClass] = React.useState<string | null>(null);
 
   const instructor = classes.length > 0 ? classes[0].instructors : null;
 
-  const handleBookClass = (classItem: any) => {
+  const handleBookClass = async (classItem: any) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -31,20 +31,42 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
       return;
     }
 
-    createBooking({
-      class_id: classItem.id,
-      student_id: user.id,
-      student_email: user.email!,
-      student_name: user.user_metadata?.full_name || user.email!,
-      booking_date: classItem.start_date,
-      booking_time: classItem.start_time,
-      payment_amount_cents: classItem.price_cents,
-    });
+    setBookingClass(classItem.id);
 
-    toast({
-      title: "Class Booked!",
-      description: "You've successfully booked this class.",
-    });
+    try {
+      const bookingData = {
+        booking_date: classItem.start_date,
+        booking_time: classItem.start_time,
+      };
+
+      const { data, error } = await supabase.functions.invoke('create-payment-checkout', {
+        body: {
+          classId: classItem.id,
+          bookingData,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // Open Stripe checkout in a new tab
+      window.open(data.url, '_blank');
+
+      toast({
+        title: "Redirecting to Payment",
+        description: "You'll be redirected to complete your payment.",
+      });
+    } catch (error) {
+      console.error('Booking error:', error);
+      toast({
+        title: "Booking Failed",
+        description: "There was an error processing your booking. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setBookingClass(null);
+    }
   };
 
   if (isLoading) {
@@ -152,11 +174,11 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
                     )}
                     <Button
                       onClick={() => handleBookClass(classItem)}
-                      disabled={isCreating}
+                      disabled={bookingClass === classItem.id}
                       className="w-full mt-4"
                       style={{ backgroundColor: instructor.brand_color }}
                     >
-                      {isCreating ? 'Booking...' : 'Book Class'}
+                      {bookingClass === classItem.id ? 'Processing...' : 'Book Class'}
                     </Button>
                   </div>
                 </CardContent>
