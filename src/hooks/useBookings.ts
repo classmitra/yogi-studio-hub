@@ -48,7 +48,7 @@ export const useBookings = () => {
     mutationFn: async (data: BookingInsert) => {
       const { data: booking, error } = await supabase
         .from('bookings')
-        .insert(data)
+        .insert(data as TablesInsert<'bookings'>)
         .select()
         .single();
 
