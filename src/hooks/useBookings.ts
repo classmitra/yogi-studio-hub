@@ -2,79 +2,48 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
-
-type Booking = Tables<'bookings'>;
-type BookingInsert = Omit<TablesInsert<'bookings'>, 'booking_reference'> & {
-  booking_reference?: string;
-};
-type BookingUpdate = TablesUpdate<'bookings'>;
 
 export const useBookings = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: bookings, isLoading } = useQuery({
+  const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['bookings', user?.id],
     queryFn: async () => {
-      if (!user) return [];
+      if (!user?.id) return [];
       
       const { data, error } = await supabase
         .from('bookings')
         .select(`
           *,
           classes!inner(
-            id,
             title,
-            start_date,
-            start_time,
-            duration_minutes,
             instructors!inner(
-              studio_name,
-              subdomain
+              studio_name
             )
           )
         `)
-        .eq('student_id', user.id)
-        .order('booking_date', { ascending: false });
-
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      
       if (error) throw error;
       return data || [];
     },
-    enabled: !!user,
-  });
-
-  const createBookingMutation = useMutation({
-    mutationFn: async (data: BookingInsert) => {
-      const { data: booking, error } = await supabase
-        .from('bookings')
-        .insert(data as TablesInsert<'bookings'>)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return booking;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bookings'] });
-    },
+    enabled: !!user?.id,
   });
 
   const cancelBookingMutation = useMutation({
-    mutationFn: async ({ id, reason }: { id: string; reason?: string }) => {
-      const { data, error } = await supabase
+    mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
+      const { error } = await supabase
         .from('bookings')
-        .update({
+        .update({ 
           status: 'cancelled',
-          cancelled_at: new Date().toISOString(),
           cancellation_reason: reason,
+          cancelled_at: new Date().toISOString()
         })
-        .eq('id', id)
-        .select()
-        .single();
+        .eq('id', id);
 
       if (error) throw error;
-      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
@@ -82,11 +51,9 @@ export const useBookings = () => {
   });
 
   return {
-    bookings: bookings || [],
+    bookings,
     isLoading,
-    createBooking: createBookingMutation.mutate,
     cancelBooking: cancelBookingMutation.mutate,
-    isCreating: createBookingMutation.isPending,
     isCancelling: cancelBookingMutation.isPending,
   };
 };

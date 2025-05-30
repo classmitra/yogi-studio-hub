@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Clock, Users, Calendar, DollarSign, User } from 'lucide-react';
 import { format } from 'date-fns';
+import WhatsAppWidget from '@/components/WhatsAppWidget';
 
 interface PublicStudioViewProps {
   subdomain: string;
@@ -188,6 +189,9 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
           </div>
         )}
       </div>
+
+      {/* WhatsApp Widget */}
+      <WhatsAppWidget />
     </div>
   );
 };
