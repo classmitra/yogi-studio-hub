@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { useInstructor } from '@/hooks/useInstructor';
 import { useClasses } from '@/hooks/useClasses';
 import ClassForm from '@/components/classes/ClassForm';
+import BookingManagement from '@/components/dashboard/BookingManagement';
+import QuickActions from '@/components/dashboard/QuickActions';
 import { 
   Calendar, 
   Users, 
@@ -13,10 +15,6 @@ import {
   Clock, 
   Plus,
   TrendingUp,
-  Video,
-  MessageCircle,
-  Settings,
-  BarChart3,
   Globe,
   Edit,
   Trash2
@@ -70,6 +68,11 @@ const EnhancedInstructorDashboard = () => {
     }
   };
 
+  const handleShowClassForm = () => {
+    setEditingClass(null);
+    setShowClassForm(true);
+  };
+
   return (
     <div className="min-h-screen bg-yoga-gradient p-6">
       <div className="max-w-7xl mx-auto">
@@ -93,7 +96,7 @@ const EnhancedInstructorDashboard = () => {
               <span>View Studio</span>
             </Button>
             <Button 
-              onClick={() => setShowClassForm(true)}
+              onClick={handleShowClassForm}
               className="bg-yoga-600 hover:bg-yoga-700 text-white flex items-center space-x-2"
             >
               <Plus className="h-4 w-4" />
@@ -124,7 +127,7 @@ const EnhancedInstructorDashboard = () => {
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Classes Management */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-8">
             <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-md">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -135,7 +138,7 @@ const EnhancedInstructorDashboard = () => {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => setShowClassForm(true)}
+                    onClick={handleShowClassForm}
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Class
@@ -199,7 +202,7 @@ const EnhancedInstructorDashboard = () => {
                       <h3 className="text-lg font-medium text-gray-900 mb-2">No classes yet</h3>
                       <p className="text-gray-600 mb-4">Create your first yoga class to get started!</p>
                       <Button 
-                        onClick={() => setShowClassForm(true)}
+                        onClick={handleShowClassForm}
                         className="bg-yoga-600 hover:bg-yoga-700 text-white"
                       >
                         <Plus className="h-4 w-4 mr-2" />
@@ -210,34 +213,17 @@ const EnhancedInstructorDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Booking Management */}
+            <div id="booking-management">
+              <BookingManagement />
+            </div>
           </div>
 
-          {/* Quick Actions & Info */}
+          {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Actions */}
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-md">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-900">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Schedule New Class
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Users className="h-4 w-4 mr-2" />
-                  View Bookings
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Video className="h-4 w-4 mr-2" />
-                  Setup Zoom/Meet
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Studio Settings
-                </Button>
-              </CardContent>
-            </Card>
+            <QuickActions onShowClassForm={handleShowClassForm} />
 
             {/* Studio Info */}
             <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-md">
