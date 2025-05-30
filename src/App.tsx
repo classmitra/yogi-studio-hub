@@ -9,6 +9,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import StudioSetup from "./pages/StudioSetup";
+import Dashboard from "./pages/Dashboard";
+import Studio from "./pages/Studio";
 import NotFound from "./pages/NotFound";
 
 // Create QueryClient instance outside of component to prevent recreating on each render
@@ -33,6 +35,8 @@ const App: React.FC = () => {
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/studio-setup" element={<StudioSetup />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/studio/:subdomain" element={<Studio />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
