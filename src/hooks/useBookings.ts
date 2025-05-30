@@ -5,7 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 
 type Booking = Tables<'bookings'>;
-type BookingInsert = TablesInsert<'bookings'>;
+type BookingInsert = Omit<TablesInsert<'bookings'>, 'booking_reference'> & {
+  booking_reference?: string;
+};
 type BookingUpdate = TablesUpdate<'bookings'>;
 
 export const useBookings = () => {
@@ -46,7 +48,7 @@ export const useBookings = () => {
     mutationFn: async (data: BookingInsert) => {
       const { data: booking, error } = await supabase
         .from('bookings')
-        .insert(data)
+        .insert(data as TablesInsert<'bookings'>)
         .select()
         .single();
 
