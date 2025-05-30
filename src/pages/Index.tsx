@@ -2,17 +2,20 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import LandingPage from '@/components/LandingPage';
-import InstructorDashboard from '@/components/InstructorDashboard';
+import EnhancedInstructorDashboard from '@/components/dashboard/EnhancedInstructorDashboard';
 import ClassScheduler from '@/components/ClassScheduler';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useInstructor } from '@/hooks/useInstructor';
+import { Navigate } from 'react-router-dom';
 
 const Index = () => {
   const [currentView, setCurrentView] = useState('landing'); // landing, dashboard, scheduler
   const { user, loading } = useAuth();
+  const { instructor, isLoading: instructorLoading } = useInstructor();
 
   // Show loading while checking auth state
-  if (loading) {
+  if (loading || instructorLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -25,10 +28,15 @@ const Index = () => {
     );
   }
 
+  // If user is authenticated but doesn't have an instructor profile, redirect to setup
+  if (user && !instructor) {
+    return <Navigate to="/studio-setup" replace />;
+  }
+
   const renderCurrentView = () => {
     switch (currentView) {
       case 'dashboard':
-        return <InstructorDashboard />;
+        return <EnhancedInstructorDashboard />;
       case 'scheduler':
         return <ClassScheduler />;
       default:
@@ -41,10 +49,10 @@ const Index = () => {
       {currentView === 'landing' && <Header />}
       
       {/* Demo Navigation (for demonstration purposes) - only show if user is authenticated */}
-      {currentView === 'landing' && user && (
+      {currentView === 'landing' && user && instructor && (
         <div className="fixed bottom-6 right-6 z-50">
           <div className="bg-white/90 backdrop-blur-md rounded-lg shadow-lg p-4 border border-gray-200">
-            <p className="text-sm font-medium text-gray-700 mb-3">🚀 Demo Navigation</p>
+            <p className="text-sm font-medium text-gray-700 mb-3">🚀 Studio Management</p>
             <div className="flex flex-col space-y-2">
               <Button 
                 size="sm" 
@@ -52,7 +60,7 @@ const Index = () => {
                 onClick={() => setCurrentView('dashboard')}
                 className="text-left justify-start"
               >
-                View Dashboard
+                Studio Dashboard
               </Button>
               <Button 
                 size="sm" 
