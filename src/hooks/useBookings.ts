@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface BookingWithClass {
   id: string;
-  user_id: string;
+  student_id: string;
   class_id: string;
   booking_date: string;
   booking_time: string;
@@ -36,7 +36,7 @@ export const useBookings = () => {
         .from('bookings')
         .select(`
           id,
-          user_id,
+          student_id,
           class_id,
           booking_date,
           booking_time,
@@ -53,7 +53,7 @@ export const useBookings = () => {
             )
           )
         `)
-        .eq('user_id', user.id)
+        .eq('student_id', user.id)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
