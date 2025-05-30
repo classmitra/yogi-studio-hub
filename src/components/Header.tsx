@@ -1,9 +1,14 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Flower } from 'lucide-react';
+import { Menu, X, Flower, User, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const navigation = [
     { name: 'Features', href: '#features' },
@@ -11,6 +16,14 @@ const Header = () => {
     { name: 'Testimonials', href: '#testimonials' },
     { name: 'Support', href: '#support' },
   ];
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  const handleAuthClick = () => {
+    navigate('/auth');
+  };
 
   return (
     <header className="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/20 shadow-sm">
@@ -41,12 +54,38 @@ const Header = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" className="text-gray-700 hover:text-yoga-600">
-              Sign In
-            </Button>
-            <Button className="bg-yoga-600 hover:bg-yoga-700 text-white shadow-md hover:shadow-lg transition-all duration-200">
-              Start Free Trial
-            </Button>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 text-gray-700">
+                  <User className="h-4 w-4" />
+                  <span className="text-sm">Welcome back!</span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  onClick={handleSignOut}
+                  className="text-gray-700 hover:text-yoga-600"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button 
+                  variant="ghost" 
+                  onClick={handleAuthClick}
+                  className="text-gray-700 hover:text-yoga-600"
+                >
+                  Sign In
+                </Button>
+                <Button 
+                  onClick={handleAuthClick}
+                  className="bg-yoga-600 hover:bg-yoga-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
+                >
+                  Start Free Trial
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -77,12 +116,38 @@ const Header = () => {
                 </a>
               ))}
               <div className="flex flex-col space-y-2 px-3 pt-4">
-                <Button variant="ghost" className="justify-start text-gray-700 hover:text-yoga-600">
-                  Sign In
-                </Button>
-                <Button className="bg-yoga-600 hover:bg-yoga-700 text-white">
-                  Start Free Trial
-                </Button>
+                {user ? (
+                  <>
+                    <div className="flex items-center space-x-2 text-gray-700 px-3 py-2">
+                      <User className="h-4 w-4" />
+                      <span className="text-sm">Welcome back!</span>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      onClick={handleSignOut}
+                      className="justify-start text-gray-700 hover:text-yoga-600"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      variant="ghost" 
+                      onClick={handleAuthClick}
+                      className="justify-start text-gray-700 hover:text-yoga-600"
+                    >
+                      Sign In
+                    </Button>
+                    <Button 
+                      onClick={handleAuthClick}
+                      className="bg-yoga-600 hover:bg-yoga-700 text-white"
+                    >
+                      Start Free Trial
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
