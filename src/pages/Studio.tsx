@@ -6,7 +6,7 @@ import PublicStudioView from '@/components/student/PublicStudioView';
 const Studio = () => {
   const { subdomain } = useParams<{ subdomain: string }>();
 
-  console.log('Studio page loaded with subdomain:', subdomain);
+  console.log('Studio page - subdomain from params:', subdomain);
 
   if (!subdomain) {
     return (

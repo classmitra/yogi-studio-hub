@@ -91,11 +91,11 @@ export const usePublicClasses = (subdomain?: string) => {
     queryKey: ['public-classes', subdomain],
     queryFn: async () => {
       if (!subdomain) {
-        console.log('No subdomain provided to usePublicClasses');
+        console.log('usePublicClasses - No subdomain provided');
         return [];
       }
       
-      console.log('Fetching classes for subdomain:', subdomain);
+      console.log('usePublicClasses - Fetching classes for subdomain:', subdomain);
       
       const { data, error } = await supabase
         .from('classes')
@@ -116,11 +116,11 @@ export const usePublicClasses = (subdomain?: string) => {
         .order('start_date', { ascending: true });
       
       if (error) {
-        console.error('Error fetching public classes:', error);
+        console.error('usePublicClasses - Error fetching classes:', error);
         throw error;
       }
       
-      console.log('Fetched classes data:', data);
+      console.log('usePublicClasses - Fetched classes data:', data);
       return data || [];
     },
     enabled: !!subdomain,
