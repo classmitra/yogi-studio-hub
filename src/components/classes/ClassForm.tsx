@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,7 +47,7 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     start_time: editingClass?.start_time || '',
     end_date: editingClass?.end_date || '', // This should be blank by default
     timezone: editingClass?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
-    meeting_link: editingClass?.meeting_link || '',
+    meeting_url: editingClass?.meeting_url || '',
     meeting_provider: editingClass?.meeting_provider || 'zoom',
     auto_create_meeting: true,
     is_recurring: editingClass?.is_recurring || false,
@@ -129,7 +128,7 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     try {
       let meetingDetails = null;
       
-      if (formData.auto_create_meeting && !formData.meeting_link) {
+      if (formData.auto_create_meeting && !formData.meeting_url) {
         const { MeetingIntegrationService } = await import('@/services/meetingIntegration');
         
         meetingDetails = await MeetingIntegrationService.createMeeting({
@@ -144,25 +143,27 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
       }
 
       const classData = {
-        ...formData,
+        title: formData.title,
+        description: formData.description,
         category: finalCategory,
+        difficulty_level: formData.difficulty_level,
+        duration_minutes: formData.duration_minutes,
+        max_students: formData.max_students,
+        price_cents: formData.price_cents,
+        start_date: formData.start_date,
+        start_time: formData.start_time,
+        timezone: formData.timezone,
         instructor_id: instructor.id,
         is_active: true,
-        meeting_url: meetingDetails?.join_url || formData.meeting_link || null,
+        meeting_url: meetingDetails?.join_url || formData.meeting_url || null,
         meeting_id: meetingDetails?.meeting_id || null,
         meeting_password: meetingDetails?.password || null,
         // Only set end_date if it's not empty and is_recurring is true
         end_date: formData.is_recurring && formData.end_date ? formData.end_date : null,
         recurrence_days: formData.is_recurring ? formData.recurrence_days : null,
         recurrence_pattern: formData.is_recurring ? formData.recurrence_pattern : null,
+        is_recurring: formData.is_recurring,
       };
-
-      // Remove fields that don't exist in the database schema
-      delete classData.custom_category;
-      delete classData.auto_create_meeting;
-      delete classData.meeting_provider;
-      delete classData.payment_model;
-      delete classData.visibility_for_ineligible;
 
       if (editingClass) {
         updateClass({ id: editingClass.id, ...classData });
@@ -417,11 +418,11 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
 
               {!formData.auto_create_meeting && (
                 <div className="space-y-2">
-                  <Label htmlFor="meeting_link" className="text-sm font-medium text-black">Manual Meeting Link</Label>
+                  <Label htmlFor="meeting_url" className="text-sm font-medium text-black">Manual Meeting Link</Label>
                   <Input
-                    id="meeting_link"
-                    value={formData.meeting_link}
-                    onChange={(e) => handleInputChange('meeting_link', e.target.value)}
+                    id="meeting_url"
+                    value={formData.meeting_url}
+                    onChange={(e) => handleInputChange('meeting_url', e.target.value)}
                     placeholder="Enter your Zoom, Google Meet, or other video call link"
                     className="border-gray-300 focus:border-black focus:ring-black"
                   />
