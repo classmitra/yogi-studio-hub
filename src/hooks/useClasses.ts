@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
@@ -159,31 +158,44 @@ export const usePublicClasses = (subdomain?: string) => {
       
       console.log('usePublicClasses - Fetching classes for subdomain:', subdomain);
       
-      const { data, error } = await supabase
-        .from('classes')
-        .select(`
-          *,
-          instructors!inner(
-            id,
-            studio_name,
-            subdomain,
-            bio,
-            brand_color,
-            profile_image_url
-          )
-        `)
-        .eq('instructors.subdomain', subdomain)
-        .eq('is_active', true)
-        .gte('start_date', new Date().toISOString().split('T')[0])
-        .order('start_date', { ascending: true });
+      // First get the instructor by subdomain
+      const { data: instructor, error: instructorError } = await supabase
+        .from('instructors')
+        .select('*')
+        .eq('subdomain', subdomain)
+        .single();
       
-      if (error) {
-        console.error('usePublicClasses - Error fetching classes:', error);
-        throw error;
+      if (instructorError) {
+        console.error('usePublicClasses - Error fetching instructor:', instructorError);
+        throw instructorError;
       }
       
-      console.log('usePublicClasses - Fetched classes data:', data);
-      return data || [];
+      if (!instructor) {
+        console.log('usePublicClasses - No instructor found for subdomain:', subdomain);
+        return [];
+      }
+      
+      // Then get the classes for this instructor
+      const { data: classesData, error: classesError } = await supabase
+        .from('classes')
+        .select('*')
+        .eq('instructor_id', instructor.id)
+        .eq('is_active', true)
+        .order('start_date', { ascending: true });
+      
+      if (classesError) {
+        console.error('usePublicClasses - Error fetching classes:', classesError);
+        throw classesError;
+      }
+      
+      // Add instructor data to each class
+      const classesWithInstructor = (classesData || []).map(classItem => ({
+        ...classItem,
+        instructors: instructor
+      }));
+      
+      console.log('usePublicClasses - Fetched classes data:', classesWithInstructor);
+      return classesWithInstructor;
     },
     enabled: !!subdomain,
   });

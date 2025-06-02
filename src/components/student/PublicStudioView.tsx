@@ -1,14 +1,13 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { usePublicClasses } from '@/hooks/useClasses';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { Clock, Users, Calendar, DollarSign, User, MapPin, Star, Award } from 'lucide-react';
 import { format } from 'date-fns';
 import WhatsAppWidget from '@/components/WhatsAppWidget';
+import StudentBookingFlow from './StudentBookingFlow';
 
 interface PublicStudioViewProps {
   subdomain: string;
@@ -16,60 +15,11 @@ interface PublicStudioViewProps {
 
 const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
   const { classes, isLoading } = usePublicClasses(subdomain);
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [bookingClass, setBookingClass] = React.useState<string | null>(null);
+  const [selectedClass, setSelectedClass] = React.useState<any>(null);
 
   console.log('PublicStudioView loaded with:', { subdomain, classes, isLoading });
 
   const instructor = classes.length > 0 ? classes[0].instructors : null;
-
-  const handleBookClass = async (classItem: any) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to book a class.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setBookingClass(classItem.id);
-
-    try {
-      const bookingData = {
-        booking_date: classItem.start_date,
-        booking_time: classItem.start_time,
-      };
-
-      const { data, error } = await supabase.functions.invoke('create-payment-checkout', {
-        body: {
-          classId: classItem.id,
-          bookingData,
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      window.open(data.url, '_blank');
-
-      toast({
-        title: "Redirecting to Payment",
-        description: "You'll be redirected to complete your payment.",
-      });
-    } catch (error) {
-      console.error('Booking error:', error);
-      toast({
-        title: "Booking Failed",
-        description: "There was an error processing your booking. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setBookingClass(null);
-    }
-  };
 
   const getDifficultyColor = (level: string) => {
     switch (level.toLowerCase()) {
@@ -130,7 +80,7 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
       className="min-h-screen bg-gradient-to-br from-yoga-50 to-ocean-50"
       style={{ backgroundColor: instructor.brand_color + '10' }}
     >
-      {/* Enhanced Studio Header */}
+      {/* Studio Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0 md:space-x-8">
@@ -175,22 +125,13 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
         </div>
       </div>
 
-      {/* Enhanced Classes Section */}
+      {/* Classes Section */}
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Upcoming Classes</h2>
-            <p className="text-gray-600">Join our community and transform your practice</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Available Classes</h2>
+            <p className="text-gray-600">Book your class and join our yoga community</p>
           </div>
-          {!user && (
-            <Button 
-              variant="outline" 
-              onClick={() => window.location.href = '/auth'}
-              className="hidden md:flex"
-            >
-              Sign In to Book
-            </Button>
-          )}
         </div>
         
         {classes.length === 0 ? (
@@ -259,22 +200,14 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
                       <span className="text-sm text-gray-500 ml-1">USD</span>
                     </div>
                     <Button
-                      onClick={() => handleBookClass(classItem)}
-                      disabled={bookingClass === classItem.id}
+                      onClick={() => setSelectedClass(classItem)}
                       className="px-6 py-2 font-semibold transition-all duration-200"
                       style={{ 
                         backgroundColor: instructor.brand_color,
                         borderColor: instructor.brand_color 
                       }}
                     >
-                      {bookingClass === classItem.id ? (
-                        <div className="flex items-center space-x-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          <span>Processing...</span>
-                        </div>
-                      ) : (
-                        'Book Now'
-                      )}
+                      Book Now
                     </Button>
                   </div>
                 </CardContent>
@@ -283,6 +216,15 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
           </div>
         )}
       </div>
+
+      {/* Booking Modal */}
+      {selectedClass && (
+        <StudentBookingFlow 
+          classItem={selectedClass}
+          instructor={instructor}
+          onClose={() => setSelectedClass(null)}
+        />
+      )}
 
       <WhatsAppWidget />
     </div>
