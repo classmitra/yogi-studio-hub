@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useClasses } from '@/hooks/useClasses';
 import { useInstructor } from '@/hooks/useInstructor';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import { X, Plus, Sparkles, DollarSign, Euro, IndianRupee } from 'lucide-react';
 import AiTextHelper from '@/components/ui/ai-text-helper';
 
@@ -21,6 +22,7 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
   const { instructor } = useInstructor();
   const { createClass, updateClass, isCreating, isUpdating } = useClasses(instructor?.id);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -44,7 +46,7 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     currency: editingClass?.currency || 'USD',
     start_date: editingClass?.start_date || '',
     start_time: editingClass?.start_time || '',
-    end_date: editingClass?.end_date || '',
+    end_date: editingClass?.end_date || '', // This should be blank by default
     timezone: editingClass?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
     meeting_link: editingClass?.meeting_link || '',
     meeting_provider: editingClass?.meeting_provider || 'zoom',
@@ -171,10 +173,11 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
         category: finalCategory,
         instructor_id: instructor.id,
         is_active: true,
-        meeting_link: meetingDetails?.join_url || formData.meeting_link || null,
+        meeting_url: meetingDetails?.join_url || formData.meeting_link || null,
         meeting_id: meetingDetails?.meeting_id || null,
         meeting_password: meetingDetails?.password || null,
-        end_date: formData.is_recurring ? formData.end_date || null : null,
+        // Only set end_date if it's not empty and is_recurring is true
+        end_date: formData.is_recurring && formData.end_date ? formData.end_date : null,
         recurrence_days: formData.is_recurring ? formData.recurrence_days : null,
         recurrence_pattern: formData.is_recurring ? formData.recurrence_pattern : null,
       };
@@ -195,6 +198,8 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
       });
 
       onClose();
+      // Redirect to class schedule instead of dashboard
+      navigate('/class-schedule');
     } catch (error) {
       console.error('Class creation error:', error);
       toast({
@@ -222,6 +227,11 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
       : formData.recurrence_days.filter(d => d !== day);
     
     handleInputChange('recurrence_days', updatedDays);
+  };
+
+  // Function to clear the end date
+  const clearEndDate = () => {
+    handleInputChange('end_date', '');
   };
 
   return (
@@ -476,17 +486,31 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                   </div>
                 )}
 
+                {/* Improved end date field with clear option */}
                 <div className="space-y-2">
                   <Label htmlFor="end_date" className="text-sm font-medium text-black">
                     Ends on [optional]
                   </Label>
-                  <Input
-                    id="end_date"
-                    type="date"
-                    value={formData.end_date}
-                    onChange={(e) => handleInputChange('end_date', e.target.value)}
-                    className="border-gray-300 focus:border-black focus:ring-black"
-                  />
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      id="end_date"
+                      type="date"
+                      value={formData.end_date}
+                      onChange={(e) => handleInputChange('end_date', e.target.value)}
+                      className="border-gray-300 focus:border-black focus:ring-black flex-1"
+                    />
+                    {formData.end_date && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={clearEndDate}
+                        className="border-gray-300 text-gray-600 hover:bg-gray-50"
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </div>
                   <p className="text-xs text-gray-500">
                     Enter the date on or before which you want the recurring classes to end. 
                     Leave empty if you want the recurring classes to continue forever.
@@ -603,9 +627,9 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="meeting_link" className="text-sm font-medium text-black">Meeting Link (Zoom/Google Meet)</Label>
+            <Label htmlFor="meeting_link_manual" className="text-sm font-medium text-black">Meeting Link (Zoom/Google Meet)</Label>
             <Input
-              id="meeting_link"
+              id="meeting_link_manual"
               value={formData.meeting_link}
               onChange={(e) => handleInputChange('meeting_link', e.target.value)}
               placeholder="Zoom, Google Meet, or other video call link"

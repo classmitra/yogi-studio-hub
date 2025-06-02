@@ -40,6 +40,7 @@ export const useClasses = (instructorId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['classes'] });
+      queryClient.invalidateQueries({ queryKey: ['public-classes'] });
     },
   });
 
@@ -57,6 +58,7 @@ export const useClasses = (instructorId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['classes'] });
+      queryClient.invalidateQueries({ queryKey: ['public-classes'] });
     },
   });
 
@@ -71,6 +73,7 @@ export const useClasses = (instructorId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['classes'] });
+      queryClient.invalidateQueries({ queryKey: ['public-classes'] });
     },
   });
 
