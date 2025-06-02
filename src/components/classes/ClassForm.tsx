@@ -35,6 +35,8 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     start_time: editingClass?.start_time || '',
     end_date: editingClass?.end_date || '',
     meeting_link: editingClass?.meeting_link || '',
+    meeting_provider: editingClass?.meeting_provider || 'zoom',
+    auto_create_meeting: true,
     is_recurring: editingClass?.is_recurring || false,
     recurrence_pattern: editingClass?.recurrence_pattern || 'weekly',
     recurrence_days: editingClass?.recurrence_days || [],
@@ -79,20 +81,42 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
 
     const finalCategory = formData.category === 'custom' ? formData.custom_category : formData.category;
 
-    const classData = {
-      ...formData,
-      category: finalCategory,
-      instructor_id: instructor.id,
-      is_active: true,
-      end_date: formData.is_recurring ? formData.end_date || null : null,
-      recurrence_days: formData.is_recurring ? formData.recurrence_days : null,
-      recurrence_pattern: formData.is_recurring ? formData.recurrence_pattern : null,
-    };
-
-    // Remove custom_category from the data sent to the server
-    delete classData.custom_category;
-
     try {
+      let meetingDetails = null;
+      
+      // Create meeting if auto-create is enabled and no manual link provided
+      if (formData.auto_create_meeting && !formData.meeting_link) {
+        const { MeetingIntegrationService } = await import('@/services/meetingIntegration');
+        
+        meetingDetails = await MeetingIntegrationService.createMeeting({
+          title: formData.title,
+          start_time: formData.start_time,
+          start_date: formData.start_date,
+          duration_minutes: formData.duration_minutes,
+          description: formData.description,
+          instructor_email: instructor.email || '',
+          provider: formData.meeting_provider as 'zoom' | 'google_meet'
+        });
+      }
+
+      const classData = {
+        ...formData,
+        category: finalCategory,
+        instructor_id: instructor.id,
+        is_active: true,
+        meeting_link: meetingDetails?.join_url || formData.meeting_link || null,
+        meeting_id: meetingDetails?.meeting_id || null,
+        meeting_password: meetingDetails?.password || null,
+        end_date: formData.is_recurring ? formData.end_date || null : null,
+        recurrence_days: formData.is_recurring ? formData.recurrence_days : null,
+        recurrence_pattern: formData.is_recurring ? formData.recurrence_pattern : null,
+      };
+
+      // Remove fields that shouldn't be sent to the server
+      delete classData.custom_category;
+      delete classData.auto_create_meeting;
+      delete classData.meeting_provider;
+
       if (editingClass) {
         updateClass({ id: editingClass.id, ...classData });
       } else {
@@ -101,14 +125,15 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
 
       toast({
         title: editingClass ? "Class Updated" : "Class Created",
-        description: `Your yoga class has been ${editingClass ? 'updated' : 'created'} successfully.`,
+        description: `Your yoga class has been ${editingClass ? 'updated' : 'created'} successfully.${meetingDetails ? ' Meeting link has been automatically generated.' : ''}`,
       });
 
       onClose();
     } catch (error) {
+      console.error('Class creation error:', error);
       toast({
         title: "Error",
-        description: "Failed to save class. Please try again.",
+        description: error.message || "Failed to save class. Please try again.",
         variant: "destructive",
       });
     }
@@ -265,6 +290,57 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                 required
                 className="border-gray-300 focus:border-black focus:ring-black"
               />
+            </div>
+          </div>
+
+          {/* Meeting Configuration Section */}
+          <div className="border-t border-gray-200 pt-6">
+            <div className="text-lg font-semibold text-black border-b border-gray-200 pb-2 mb-4">
+              Meeting Configuration
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="auto_create_meeting"
+                  checked={formData.auto_create_meeting}
+                  onCheckedChange={(checked) => handleInputChange('auto_create_meeting', checked)}
+                />
+                <Label htmlFor="auto_create_meeting" className="text-sm font-medium text-black">
+                  Automatically create meeting link
+                </Label>
+              </div>
+
+              {formData.auto_create_meeting && (
+                <div className="space-y-2 pl-6 border-l-2 border-gray-200">
+                  <Label className="text-sm font-medium text-black">Meeting Provider*</Label>
+                  <Select value={formData.meeting_provider} onValueChange={(value) => handleInputChange('meeting_provider', value)}>
+                    <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black bg-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-gray-300 z-50">
+                      <SelectItem value="zoom">Zoom</SelectItem>
+                      <SelectItem value="google_meet">Google Meet</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-gray-500">
+                    Meeting will be automatically created and the link will be shared with students via email.
+                  </p>
+                </div>
+              )}
+
+              {!formData.auto_create_meeting && (
+                <div className="space-y-2">
+                  <Label htmlFor="meeting_link" className="text-sm font-medium text-black">Manual Meeting Link</Label>
+                  <Input
+                    id="meeting_link"
+                    value={formData.meeting_link}
+                    onChange={(e) => handleInputChange('meeting_link', e.target.value)}
+                    placeholder="Enter your Zoom, Google Meet, or other video call link"
+                    className="border-gray-300 focus:border-black focus:ring-black"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
