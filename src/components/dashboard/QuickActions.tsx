@@ -36,21 +36,21 @@ const QuickActions = () => {
       icon: Users,
       label: 'Manage Students',
       description: 'View and manage your students',
-      onClick: () => navigate('/dashboard'), // Will be enhanced later
+      onClick: () => navigate('/students-management'),
       primary: false
     },
     {
       icon: Calendar,
       label: 'Class Schedule',
       description: 'View your class calendar',
-      onClick: () => navigate('/dashboard'), // Will be enhanced later
+      onClick: () => navigate('/class-schedule'),
       primary: false
     },
     {
       icon: BarChart3,
       label: 'Analytics',
       description: 'View performance metrics',
-      onClick: () => navigate('/dashboard'), // Will be enhanced later
+      onClick: () => navigate('/analytics'),
       primary: false
     },
     {
