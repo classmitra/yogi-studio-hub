@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import StudioSetup from "./pages/StudioSetup";
 import Dashboard from "./pages/Dashboard";
 import Studio from "./pages/Studio";
+import ViewStudio from "./pages/ViewStudio";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancelled from "./pages/PaymentCancelled";
 import StudentDashboard from "./pages/StudentDashboard";

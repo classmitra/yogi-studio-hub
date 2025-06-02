@@ -1,159 +1,103 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useInstructor } from '@/hooks/useInstructor';
-import { useToast } from '@/hooks/use-toast';
 import { 
-  Plus,
-  Users,
-  Settings,
+  Plus, 
+  Users, 
+  BarChart3, 
+  Eye, 
   Calendar,
-  BarChart3,
-  Video,
-  Globe,
-  MessageCircle,
-  HelpCircle
+  Settings 
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import ClassForm from '@/components/classes/ClassForm';
 
-interface QuickActionsProps {
-  onShowClassForm: () => void;
-}
+const QuickActions = () => {
+  const navigate = useNavigate();
+  const [showClassForm, setShowClassForm] = useState(false);
 
-const QuickActions = ({ onShowClassForm }: QuickActionsProps) => {
-  const { instructor } = useInstructor();
-  const { toast } = useToast();
-
-  const handleViewStudio = () => {
-    if (instructor?.subdomain) {
-      window.open(`https://${instructor.subdomain}.yogastudio.app`, '_blank');
-    } else {
-      toast({
-        title: "Studio not available",
-        description: "Please complete your studio setup first.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleViewBookings = () => {
-    document.getElementById('booking-management')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const handleStudioSettings = () => {
-    toast({
-      title: "Coming Soon",
-      description: "Studio settings panel will be available soon.",
-    });
-  };
-
-  const handleAnalytics = () => {
-    toast({
-      title: "Coming Soon", 
-      description: "Analytics dashboard will be available soon.",
-    });
-  };
-
-  const handleVideoSetup = () => {
-    toast({
-      title: "Video Setup",
-      description: "Add your meeting links when creating classes.",
-    });
-  };
-
-  const handleStudentManagement = () => {
-    toast({
-      title: "Coming Soon",
-      description: "Student management panel will be available soon.",
-    });
-  };
-
-  const handleCalendarView = () => {
-    toast({
-      title: "Coming Soon", 
-      description: "Calendar view coming soon.",
-    });
-  };
-
-  const handleSupport = () => {
-    toast({
-      title: "Support",
-      description: "Contact us at support@yogastudio.app for assistance.",
-    });
-  };
-
-  const quickActions = [
+  const actions = [
     {
-      title: "Schedule New Class",
       icon: Plus,
-      action: onShowClassForm,
+      label: 'Create New Class',
+      description: 'Schedule a new yoga class',
+      onClick: () => setShowClassForm(true),
       primary: true
     },
     {
-      title: "View My Studio",
-      icon: Globe,
-      action: handleViewStudio
+      icon: Eye,
+      label: 'View Studio',
+      description: 'Preview your public studio page',
+      onClick: () => navigate('/view-studio'),
+      primary: false
     },
     {
-      title: "View Bookings",
       icon: Users,
-      action: handleViewBookings
+      label: 'Manage Students',
+      description: 'View and manage your students',
+      onClick: () => navigate('/dashboard'), // Will be enhanced later
+      primary: false
     },
     {
-      title: "Class Calendar",
       icon: Calendar,
-      action: handleCalendarView
+      label: 'Class Schedule',
+      description: 'View your class calendar',
+      onClick: () => navigate('/dashboard'), // Will be enhanced later
+      primary: false
     },
     {
-      title: "Manage Students",
-      icon: Users,
-      action: handleStudentManagement
-    },
-    {
-      title: "Setup Video Calls",
-      icon: Video,
-      action: handleVideoSetup
-    },
-    {
-      title: "Analytics",
       icon: BarChart3,
-      action: handleAnalytics
+      label: 'Analytics',
+      description: 'View performance metrics',
+      onClick: () => navigate('/dashboard'), // Will be enhanced later
+      primary: false
     },
     {
-      title: "Studio Settings", 
       icon: Settings,
-      action: handleStudioSettings
-    },
-    {
-      title: "Get Support",
-      icon: HelpCircle,
-      action: handleSupport
+      label: 'Studio Settings',
+      description: 'Update your studio information',
+      onClick: () => navigate('/studio-setup'),
+      primary: false
     }
   ];
 
   return (
-    <Card className="minimal-card">
-      <CardHeader className="border-b border-gray-200">
-        <CardTitle className="text-lg font-semibold text-black">Quick Actions</CardTitle>
-      </CardHeader>
-      <CardContent className="p-6 space-y-2">
-        {quickActions.map((action, index) => (
-          <Button
-            key={index}
-            variant={action.primary ? "default" : "outline"}
-            className={`w-full justify-start ${
-              action.primary 
-                ? "bg-black hover:bg-gray-800 text-white" 
-                : "border-gray-300 text-black hover:bg-gray-50"
-            }`}
-            onClick={action.action}
-          >
-            <action.icon className="h-4 w-4 mr-2" />
-            {action.title}
-          </Button>
-        ))}
-      </CardContent>
-    </Card>
+    <>
+      <Card className="border border-gray-200 shadow-sm bg-white">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold text-black">Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {actions.map((action, index) => (
+            <Button
+              key={index}
+              variant={action.primary ? "default" : "outline"}
+              className={`w-full justify-start h-auto p-4 ${
+                action.primary 
+                  ? 'bg-black hover:bg-gray-800 text-white' 
+                  : 'border-gray-300 text-black hover:bg-gray-50'
+              }`}
+              onClick={action.onClick}
+            >
+              <div className="flex items-start space-x-3 w-full">
+                <action.icon className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <div className="text-left">
+                  <div className="font-medium">{action.label}</div>
+                  <div className={`text-xs ${action.primary ? 'text-gray-200' : 'text-gray-500'}`}>
+                    {action.description}
+                  </div>
+                </div>
+              </div>
+            </Button>
+          ))}
+        </CardContent>
+      </Card>
+
+      {showClassForm && (
+        <ClassForm onClose={() => setShowClassForm(false)} />
+      )}
+    </>
   );
 };
 
