@@ -7,7 +7,7 @@ import { usePublicClasses } from '@/hooks/useClasses';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Clock, Users, Calendar, DollarSign, User } from 'lucide-react';
+import { Clock, Users, Calendar, DollarSign, User, MapPin, Star, Award } from 'lucide-react';
 import { format } from 'date-fns';
 import WhatsAppWidget from '@/components/WhatsAppWidget';
 
@@ -52,7 +52,6 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
         throw error;
       }
 
-      // Open Stripe checkout in a new tab
       window.open(data.url, '_blank');
 
       toast({
@@ -68,6 +67,23 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
       });
     } finally {
       setBookingClass(null);
+    }
+  };
+
+  const getDifficultyColor = (level: string) => {
+    switch (level.toLowerCase()) {
+      case 'beginner': return 'bg-green-100 text-green-800';
+      case 'intermediate': return 'bg-yellow-100 text-yellow-800';
+      case 'advanced': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getCategoryIcon = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'hatha': return <Star className="h-4 w-4" />;
+      case 'vinyasa': return <Award className="h-4 w-4" />;
+      default: return <Star className="h-4 w-4" />;
     }
   };
 
@@ -100,28 +116,44 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
       className="min-h-screen bg-gradient-to-br from-yoga-50 to-ocean-50"
       style={{ backgroundColor: instructor.brand_color + '10' }}
     >
-      {/* Studio Header */}
+      {/* Enhanced Studio Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="flex items-center space-x-6">
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          <div className="flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0 md:space-x-8">
             {instructor.profile_image_url && (
-              <img
-                src={instructor.profile_image_url}
-                alt={instructor.studio_name}
-                className="w-20 h-20 rounded-full object-cover"
-              />
+              <div className="relative">
+                <img
+                  src={instructor.profile_image_url}
+                  alt={instructor.studio_name}
+                  className="w-32 h-32 rounded-full object-cover shadow-lg border-4 border-white"
+                />
+                <div 
+                  className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
+                  style={{ backgroundColor: instructor.brand_color }}
+                >
+                  <Star className="h-4 w-4 text-white" />
+                </div>
+              </div>
             )}
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900" style={{ color: instructor.brand_color }}>
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold text-gray-900 mb-2" style={{ color: instructor.brand_color }}>
                 {instructor.studio_name}
               </h1>
               {instructor.bio && (
-                <p className="text-gray-600 mt-2 max-w-2xl">{instructor.bio}</p>
+                <p className="text-gray-600 text-lg leading-relaxed mb-4 max-w-3xl">{instructor.bio}</p>
               )}
-              <div className="flex items-center space-x-4 mt-3 text-sm text-gray-500">
-                <span className="flex items-center">
-                  <User className="h-4 w-4 mr-1" />
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                <span className="flex items-center bg-gray-100 px-3 py-1 rounded-full">
+                  <User className="h-4 w-4 mr-2" />
                   {subdomain}.yogastudio.app
+                </span>
+                <span className="flex items-center bg-gray-100 px-3 py-1 rounded-full">
+                  <MapPin className="h-4 w-4 mr-2" />
+                  Online Classes
+                </span>
+                <span className="flex items-center bg-gray-100 px-3 py-1 rounded-full">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  {classes.length} Classes Available
                 </span>
               </div>
             </div>
@@ -129,58 +161,106 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
         </div>
       </div>
 
-      {/* Classes Section */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Upcoming Classes</h2>
+      {/* Enhanced Classes Section */}
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Upcoming Classes</h2>
+            <p className="text-gray-600">Join our community and transform your practice</p>
+          </div>
+          {!user && (
+            <Button 
+              variant="outline" 
+              onClick={() => window.location.href = '/auth'}
+              className="hidden md:flex"
+            >
+              Sign In to Book
+            </Button>
+          )}
+        </div>
         
         {classes.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-12">
-              <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Classes Scheduled</h3>
-              <p className="text-gray-600">Check back soon for upcoming classes.</p>
+          <Card className="bg-white shadow-lg">
+            <CardContent className="text-center py-16">
+              <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-6" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">No Classes Scheduled</h3>
+              <p className="text-gray-600 text-lg">Check back soon for upcoming classes or contact the studio directly.</p>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {classes.map((classItem) => (
-              <Card key={classItem.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-lg">{classItem.title}</CardTitle>
-                    <Badge variant="secondary" className="capitalize">
+              <Card key={classItem.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white overflow-hidden">
+                <CardHeader className="pb-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center space-x-2">
+                      {getCategoryIcon(classItem.category)}
+                      <span className="text-sm font-medium text-gray-600">{classItem.category}</span>
+                    </div>
+                    <Badge 
+                      variant="secondary" 
+                      className={`capitalize font-medium ${getDifficultyColor(classItem.difficulty_level)}`}
+                    >
                       {classItem.difficulty_level}
                     </Badge>
                   </div>
+                  <CardTitle className="text-xl font-bold text-gray-900 group-hover:text-yoga-600 transition-colors">
+                    {classItem.title}
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      {format(new Date(classItem.start_date), 'EEEE, MMMM d')}
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="flex items-center text-gray-600">
+                      <Calendar className="h-4 w-4 mr-2 text-yoga-500" />
+                      <span className="font-medium">
+                        {format(new Date(classItem.start_date), 'MMM d')}
+                      </span>
                     </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Clock className="h-4 w-4 mr-2" />
-                      {classItem.start_time} ({classItem.duration_minutes} min)
+                    <div className="flex items-center text-gray-600">
+                      <Clock className="h-4 w-4 mr-2 text-yoga-500" />
+                      <span className="font-medium">{classItem.start_time}</span>
                     </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Users className="h-4 w-4 mr-2" />
-                      Max {classItem.max_students} students
+                    <div className="flex items-center text-gray-600">
+                      <Users className="h-4 w-4 mr-2 text-yoga-500" />
+                      <span className="font-medium">Max {classItem.max_students}</span>
                     </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <DollarSign className="h-4 w-4 mr-2" />
-                      ${(classItem.price_cents / 100).toFixed(2)}
+                    <div className="flex items-center text-gray-600">
+                      <Clock className="h-4 w-4 mr-2 text-yoga-500" />
+                      <span className="font-medium">{classItem.duration_minutes}min</span>
                     </div>
-                    {classItem.description && (
-                      <p className="text-sm text-gray-600 mt-2">{classItem.description}</p>
-                    )}
+                  </div>
+                  
+                  {classItem.description && (
+                    <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+                      {classItem.description}
+                    </p>
+                  )}
+                  
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div className="flex items-center">
+                      <DollarSign className="h-5 w-5 text-green-600 mr-1" />
+                      <span className="text-2xl font-bold text-gray-900">
+                        {(classItem.price_cents / 100).toFixed(0)}
+                      </span>
+                      <span className="text-sm text-gray-500 ml-1">USD</span>
+                    </div>
                     <Button
                       onClick={() => handleBookClass(classItem)}
                       disabled={bookingClass === classItem.id}
-                      className="w-full mt-4"
-                      style={{ backgroundColor: instructor.brand_color }}
+                      className="px-6 py-2 font-semibold transition-all duration-200"
+                      style={{ 
+                        backgroundColor: instructor.brand_color,
+                        borderColor: instructor.brand_color 
+                      }}
                     >
-                      {bookingClass === classItem.id ? 'Processing...' : 'Book Class'}
+                      {bookingClass === classItem.id ? (
+                        <div className="flex items-center space-x-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Processing...</span>
+                        </div>
+                      ) : (
+                        'Book Now'
+                      )}
                     </Button>
                   </div>
                 </CardContent>
@@ -190,7 +270,6 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
         )}
       </div>
 
-      {/* WhatsApp Widget */}
       <WhatsAppWidget />
     </div>
   );
