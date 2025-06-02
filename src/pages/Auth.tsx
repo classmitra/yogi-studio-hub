@@ -35,8 +35,10 @@ const Auth = () => {
 
     try {
       if (isLogin) {
+        console.log('Attempting login with:', { email });
         const { error } = await signIn(email, password);
         if (error) {
+          console.error('Login error:', error);
           toast({
             title: "Login Failed",
             description: error.message,
@@ -50,8 +52,10 @@ const Auth = () => {
           navigate('/');
         }
       } else {
+        console.log('Attempting signup with:', { email, firstName, lastName });
         const { error } = await signUp(email, password, firstName, lastName);
         if (error) {
+          console.error('Signup error:', error);
           toast({
             title: "Sign Up Failed",
             description: error.message,
@@ -65,6 +69,7 @@ const Auth = () => {
         }
       }
     } catch (error) {
+      console.error('Auth error:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred. Please try again.",
@@ -118,15 +123,15 @@ const Auth = () => {
 
   if (showForgotPassword) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-yoga-50 to-ocean-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-yoga-500 to-ocean-500 rounded-2xl flex items-center justify-center">
+              <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center">
                 <Flower className="h-8 w-8 text-white" />
               </div>
             </div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-yoga-600 to-ocean-600 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold text-black">
               Reset Password
             </h2>
             <p className="text-gray-600 mt-2">
@@ -134,24 +139,24 @@ const Auth = () => {
             </p>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-gray-200/20">
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
             <form className="space-y-6" onSubmit={handleForgotPassword}>
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-black">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1"
+                  className="mt-1 border-gray-300 focus:border-black focus:ring-black"
                 />
               </div>
 
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-yoga-600 hover:bg-yoga-700 text-white py-3"
+                className="w-full bg-black hover:bg-gray-800 text-white py-3"
               >
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </Button>
@@ -161,7 +166,7 @@ const Auth = () => {
               <button
                 type="button"
                 onClick={() => setShowForgotPassword(false)}
-                className="text-yoga-600 hover:text-yoga-700 font-medium"
+                className="text-black hover:text-gray-700 font-medium"
               >
                 Back to Sign In
               </button>
@@ -173,72 +178,72 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yoga-50 to-ocean-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-yoga-500 to-ocean-500 rounded-2xl flex items-center justify-center">
+            <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center">
               <Flower className="h-8 w-8 text-white" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-yoga-600 to-ocean-600 bg-clip-text text-transparent">
-            YogaStudio
+          <h2 className="text-3xl font-bold text-black">
+            ClassMitra
           </h2>
           <p className="text-gray-600 mt-2">
             {isLogin ? 'Welcome back! Sign in to your account' : 'Create your account to get started'}
           </p>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-gray-200/20">
+        <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {!isLogin && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName" className="text-black">First Name</Label>
                   <Input
                     id="firstName"
                     type="text"
                     required
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="mt-1"
+                    className="mt-1 border-gray-300 focus:border-black focus:ring-black"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName" className="text-black">Last Name</Label>
                   <Input
                     id="lastName"
                     type="text"
                     required
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="mt-1"
+                    className="mt-1 border-gray-300 focus:border-black focus:ring-black"
                   />
                 </div>
               </div>
             )}
 
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-black">Email</Label>
               <Input
                 id="email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1"
+                className="mt-1 border-gray-300 focus:border-black focus:ring-black"
               />
             </div>
 
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-black">Password</Label>
               <Input
                 id="password"
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1"
+                className="mt-1 border-gray-300 focus:border-black focus:ring-black"
               />
             </div>
 
@@ -247,7 +252,7 @@ const Auth = () => {
                 <button
                   type="button"
                   onClick={() => setShowForgotPassword(true)}
-                  className="text-sm text-yoga-600 hover:text-yoga-700"
+                  className="text-sm text-black hover:text-gray-700"
                 >
                   Forgot password?
                 </button>
@@ -257,7 +262,7 @@ const Auth = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-yoga-600 hover:bg-yoga-700 text-white py-3"
+              className="w-full bg-black hover:bg-gray-800 text-white py-3 font-medium"
             >
               {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
             </Button>
@@ -269,7 +274,7 @@ const Auth = () => {
               <button
                 type="button"
                 onClick={() => setIsLogin(!isLogin)}
-                className="text-yoga-600 hover:text-yoga-700 font-medium"
+                className="text-black hover:text-gray-700 font-medium"
               >
                 {isLogin ? 'Sign up' : 'Sign in'}
               </button>
