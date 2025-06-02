@@ -58,7 +58,6 @@ const Analytics = () => {
   return (
     <div className="min-h-screen bg-white p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-black">Analytics Dashboard</h1>
@@ -79,7 +78,6 @@ const Analytics = () => {
           </div>
         </div>
 
-        {/* Metrics Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {metrics.map((metric, index) => (
             <Card key={index} className="border border-gray-200 shadow-sm">
@@ -111,7 +109,6 @@ const Analytics = () => {
 
           <TabsContent value="overview">
             <div className="grid lg:grid-cols-2 gap-6">
-              {/* Class Performance */}
               <Card className="border border-gray-200 shadow-sm">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold text-black">Class Performance</CardTitle>
@@ -134,7 +131,6 @@ const Analytics = () => {
                 </CardContent>
               </Card>
 
-              {/* Growth Chart Placeholder */}
               <Card className="border border-gray-200 shadow-sm">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold text-black">Growth Trends</CardTitle>
