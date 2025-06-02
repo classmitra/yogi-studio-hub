@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,7 +44,6 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     duration_minutes: editingClass?.duration_minutes || 60,
     max_students: editingClass?.max_students || 10,
     price_cents: editingClass?.price_cents || 0,
-    currency: editingClass?.currency || 'USD',
     start_date: editingClass?.start_date || '',
     start_time: editingClass?.start_time || '',
     end_date: editingClass?.end_date || '', // This should be blank by default
@@ -59,17 +59,6 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
   });
 
   const [showCustomCategory, setShowCustomCategory] = useState(false);
-
-  const currencies = [
-    { value: 'USD', label: 'USD ($)', icon: DollarSign },
-    { value: 'EUR', label: 'EUR (€)', icon: Euro },
-    { value: 'INR', label: 'INR (₹)', icon: IndianRupee },
-    { value: 'GBP', label: 'GBP (£)', icon: DollarSign },
-    { value: 'CAD', label: 'CAD (C$)', icon: DollarSign },
-    { value: 'AUD', label: 'AUD (A$)', icon: DollarSign },
-    { value: 'JPY', label: 'JPY (¥)', icon: DollarSign },
-    { value: 'SGD', label: 'SGD (S$)', icon: DollarSign },
-  ];
 
   const categories = [
     { value: 'hatha', label: 'Hatha' },
@@ -123,20 +112,6 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     }
   };
 
-  const getCurrencySymbol = (currency: string) => {
-    const symbols = {
-      USD: '$',
-      EUR: '€',
-      INR: '₹',
-      GBP: '£',
-      CAD: 'C$',
-      AUD: 'A$',
-      JPY: '¥',
-      SGD: 'S$'
-    };
-    return symbols[currency] || '$';
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -182,9 +157,12 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
         recurrence_pattern: formData.is_recurring ? formData.recurrence_pattern : null,
       };
 
+      // Remove fields that don't exist in the database schema
       delete classData.custom_category;
       delete classData.auto_create_meeting;
       delete classData.meeting_provider;
+      delete classData.payment_model;
+      delete classData.visibility_for_ineligible;
 
       if (editingClass) {
         updateClass({ id: editingClass.id, ...classData });
@@ -385,6 +363,20 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                 className="border-gray-300 focus:border-black focus:ring-black"
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="price" className="text-sm font-medium text-black">Price (in cents)*</Label>
+              <Input
+                id="price"
+                type="number"
+                value={formData.price_cents}
+                onChange={(e) => handleInputChange('price_cents', parseInt(e.target.value) || 0)}
+                min="0"
+                placeholder="0 for free class"
+                className="border-gray-300 focus:border-black focus:ring-black"
+              />
+              <p className="text-xs text-gray-500">Enter price in cents (e.g., 2500 for $25.00)</p>
+            </div>
           </div>
 
           {/* Meeting Configuration Section */}
@@ -536,125 +528,6 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                 duration: formData.duration_minutes
               }}
             />
-          </div>
-
-          {/* Payment Model Section */}
-          <div className="space-y-4">
-            <Label className="text-sm font-medium text-black">Payment model</Label>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  id="standard"
-                  name="payment_model"
-                  value="standard"
-                  checked={formData.payment_model === 'standard'}
-                  onChange={(e) => handleInputChange('payment_model', e.target.value)}
-                  className="text-black focus:ring-black"
-                />
-                <Label htmlFor="standard" className="text-sm text-gray-700">
-                  Standard pricing. Use this for most situations.
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  id="donation"
-                  name="payment_model"
-                  value="donation"
-                  checked={formData.payment_model === 'donation'}
-                  onChange={(e) => handleInputChange('payment_model', e.target.value)}
-                  className="text-black focus:ring-black"
-                />
-                <Label htmlFor="donation" className="text-sm text-gray-700">
-                  Donations: This is a "pay what you want" model.
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  id="free"
-                  name="payment_model"
-                  value="free"
-                  checked={formData.payment_model === 'free'}
-                  onChange={(e) => handleInputChange('payment_model', e.target.value)}
-                  className="text-black focus:ring-black"
-                />
-                <Label htmlFor="free" className="text-sm text-gray-700">
-                  Free. Use this if this class is free for everyone.
-                </Label>
-              </div>
-            </div>
-
-            {formData.payment_model === 'standard' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="currency" className="text-sm font-medium text-black">Currency*</Label>
-                  <Select value={formData.currency} onValueChange={(value) => handleInputChange('currency', value)}>
-                    <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black bg-white">
-                      <SelectValue placeholder="Select currency" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white border border-gray-300 z-50">
-                      {currencies.map((currency) => (
-                        <SelectItem key={currency.value} value={currency.value}>
-                          <div className="flex items-center space-x-2">
-                            <currency.icon className="h-4 w-4" />
-                            <span>{currency.label}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="price" className="text-sm font-medium text-black">
-                    Price ({getCurrencySymbol(formData.currency)})
-                  </Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    value={formData.price_cents / 100}
-                    onChange={(e) => handleInputChange('price_cents', Math.round(parseFloat(e.target.value || '0') * 100))}
-                    min="0"
-                    placeholder={`0.00 ${formData.currency}`}
-                    className="border-gray-300 focus:border-black focus:ring-black"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="meeting_link_manual" className="text-sm font-medium text-black">Meeting Link (Zoom/Google Meet)</Label>
-            <Input
-              id="meeting_link_manual"
-              value={formData.meeting_link}
-              onChange={(e) => handleInputChange('meeting_link', e.target.value)}
-              placeholder="Zoom, Google Meet, or other video call link"
-              className="border-gray-300 focus:border-black focus:ring-black"
-            />
-          </div>
-
-          {/* Visibility Section */}
-          <div className="border-t border-gray-200 pt-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-black">Visibility for ineligible students</Label>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="visibility_for_ineligible"
-                  checked={formData.visibility_for_ineligible}
-                  onCheckedChange={(checked) => handleInputChange('visibility_for_ineligible', checked)}
-                />
-                <Label htmlFor="visibility_for_ineligible" className="text-sm text-gray-700">
-                  Show this class with a "Fees" button to ineligible students.
-                </Label>
-              </div>
-              <p className="text-xs text-gray-500">
-                Turn this option on to help students discover this class and to encourage them to enquire about this class.
-              </p>
-            </div>
           </div>
 
           <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
