@@ -18,13 +18,13 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, context } = await req.json();
-    console.log('Generating AI text with prompt:', prompt);
+    const { prompt, existingText, formContext } = await req.json();
+    console.log('Generating AI text with contextual prompt:', prompt);
 
-    // If no OpenAI key is configured, return a placeholder response
+    // If no OpenAI key is configured, return a contextual placeholder response
     if (!openAIApiKey) {
-      console.log('OpenAI API key not configured, returning placeholder');
-      const placeholderText = generatePlaceholderText(prompt);
+      console.log('OpenAI API key not configured, returning contextual placeholder');
+      const placeholderText = generateContextualPlaceholder(existingText, formContext);
       return new Response(JSON.stringify({ generatedText: placeholderText }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -41,14 +41,14 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant that generates compelling, professional content for yoga studios and wellness businesses. Write in a warm, inviting tone that appeals to yoga practitioners.'
+            content: 'You are a skilled yoga instructor and marketing expert who writes compelling, authentic class descriptions. Focus on benefits, what students will experience, and create a warm, welcoming tone that reflects the specific style and level of the class. Keep descriptions between 100-200 words unless specifically requested otherwise.'
           },
           {
             role: 'user',
-            content: `${prompt}\n\nContext: ${context}`
+            content: prompt
           }
         ],
-        max_tokens: 500,
+        max_tokens: 300,
         temperature: 0.7,
       }),
     });
@@ -68,28 +68,67 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in generate-ai-text function:', error);
     
-    // Return a fallback placeholder instead of an error
-    const { prompt } = await req.json().catch(() => ({ prompt: 'Generate content' }));
-    const placeholderText = generatePlaceholderText(prompt);
-    
-    return new Response(JSON.stringify({ generatedText: placeholderText }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    // Return a contextual fallback instead of a generic error
+    try {
+      const { existingText, formContext } = await req.json();
+      const placeholderText = generateContextualPlaceholder(existingText, formContext);
+      
+      return new Response(JSON.stringify({ generatedText: placeholderText }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    } catch {
+      // Final fallback
+      return new Response(JSON.stringify({ 
+        generatedText: "Please describe your yoga class, including what students can expect, the style of practice, and any special benefits or focus areas." 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
   }
 });
 
-function generatePlaceholderText(prompt: string): string {
-  if (prompt.toLowerCase().includes('yoga class')) {
-    return "Join us for this transformative yoga practice designed to nurture your body, mind, and spirit. Our experienced instructor will guide you through a sequence of poses that promote flexibility, strength, and inner peace. Whether you're a beginner or advanced practitioner, this class offers modifications for all levels. Come as you are and leave feeling refreshed, centered, and connected to your authentic self.";
+function generateContextualPlaceholder(existingText: string, formContext: any): string {
+  const { title, category, difficultyLevel, duration } = formContext || {};
+  
+  // If user has existing text, improve upon it
+  if (existingText && existingText.trim()) {
+    return `${existingText.trim()} This class offers a transformative experience that nurtures both body and mind. Whether you're looking to build strength, increase flexibility, or find inner peace, you'll leave feeling refreshed and centered. All levels welcome with modifications provided as needed.`;
   }
   
-  if (prompt.toLowerCase().includes('instructor') || prompt.toLowerCase().includes('teacher')) {
-    return "Passionate yoga instructor dedicated to creating a safe and welcoming space for students of all levels. With years of experience and ongoing training, I bring authenticity and mindfulness to every class. My teaching style focuses on alignment, breath awareness, and helping students develop a sustainable practice that serves them both on and off the mat.";
+  // Generate based on context
+  let description = "";
+  
+  if (category === 'vinyasa') {
+    description = `Join us for this dynamic ${title ? title.toLowerCase() : 'vinyasa'} practice that links breath with movement. Flow through creative sequences designed to build strength, flexibility, and mindfulness.`;
+  } else if (category === 'yin') {
+    description = `Experience the restorative power of ${title ? title.toLowerCase() : 'yin yoga'}. This gentle practice uses longer-held poses to deeply stretch connective tissues and promote relaxation.`;
+  } else if (category === 'hatha') {
+    description = `Discover the foundations of yoga in this ${title ? title.toLowerCase() : 'hatha'} class. Focus on alignment, breathing, and building a strong, sustainable practice.`;
+  } else if (category === 'meditation') {
+    description = `Find inner peace and clarity in this ${title ? title.toLowerCase() : 'meditation'} session. Learn techniques to calm the mind and cultivate present-moment awareness.`;
+  } else {
+    description = `Join us for this ${title ? title.toLowerCase() : 'yoga'} practice designed to support your wellness journey.`;
   }
   
-  if (prompt.toLowerCase().includes('studio')) {
-    return "Welcome to our serene yoga studio, a sanctuary where ancient wisdom meets modern wellness. Our beautiful space is designed to support your journey of self-discovery and transformation. We offer a variety of classes, workshops, and retreats to meet you wherever you are in your practice. Come experience the healing power of yoga in our supportive community.";
+  // Add level-specific content
+  if (difficultyLevel === 'beginner') {
+    description += " Perfect for newcomers to yoga, with clear instruction and plenty of modifications offered.";
+  } else if (difficultyLevel === 'advanced') {
+    description += " Designed for experienced practitioners ready to deepen their practice and explore challenging variations.";
+  } else {
+    description += " Suitable for all levels with options to modify or advance poses based on your experience.";
   }
   
-  return "This is a placeholder text generated while AI services are being configured. Please replace this with your own content or configure the OpenAI API key in your Supabase secrets to enable AI-powered content generation.";
+  // Add duration context
+  if (duration) {
+    if (duration <= 30) {
+      description += " This focused session fits perfectly into your busy schedule.";
+    } else if (duration >= 75) {
+      description += " Take time to fully immerse yourself in this comprehensive practice.";
+    }
+  }
+  
+  description += " Come as you are and leave feeling renewed, balanced, and connected to your inner strength.";
+  
+  return description;
 }

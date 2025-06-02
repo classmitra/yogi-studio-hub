@@ -15,6 +15,12 @@ interface AiTextHelperProps {
   required?: boolean;
   rows?: number;
   className?: string;
+  formContext?: {
+    title?: string;
+    category?: string;
+    difficultyLevel?: string;
+    duration?: number;
+  };
 }
 
 const AiTextHelper = ({
@@ -25,7 +31,8 @@ const AiTextHelper = ({
   minLength,
   required = false,
   rows = 4,
-  className = ""
+  className = "",
+  formContext = {}
 }: AiTextHelperProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
@@ -34,10 +41,14 @@ const AiTextHelper = ({
     setIsGenerating(true);
     
     try {
+      // Build context from form data and existing input
+      const contextPrompt = buildContextualPrompt(value, formContext, prompt);
+      
       const { data, error } = await supabase.functions.invoke('generate-ai-text', {
         body: {
-          prompt: prompt,
-          context: value || placeholder
+          prompt: contextPrompt,
+          existingText: value,
+          formContext: formContext
         }
       });
 
@@ -47,7 +58,7 @@ const AiTextHelper = ({
         onChange(data.generatedText);
         toast({
           title: "AI Content Generated",
-          description: "AI has generated content for you. You can edit it as needed.",
+          description: "AI has created a personalized description based on your class details.",
         });
       }
     } catch (error) {
@@ -60,6 +71,43 @@ const AiTextHelper = ({
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const buildContextualPrompt = (existingText: string, context: any, basePrompt: string) => {
+    let contextualPrompt = basePrompt;
+    
+    // Add class-specific context
+    if (context.title) {
+      contextualPrompt += `\n\nClass Title: "${context.title}"`;
+    }
+    
+    if (context.category) {
+      contextualPrompt += `\nYoga Style: ${context.category}`;
+    }
+    
+    if (context.difficultyLevel) {
+      contextualPrompt += `\nDifficulty Level: ${context.difficultyLevel}`;
+    }
+    
+    if (context.duration) {
+      contextualPrompt += `\nDuration: ${context.duration} minutes`;
+    }
+
+    // Use existing text as additional context
+    if (existingText && existingText.trim()) {
+      contextualPrompt += `\n\nUser's current draft: "${existingText.trim()}"`;
+      contextualPrompt += `\n\nPlease improve and expand on this draft, making it more compelling and informative while keeping the user's original intent.`;
+    } else {
+      contextualPrompt += `\n\nPlease create an engaging, detailed description that would attract students to this class.`;
+    }
+
+    return contextualPrompt;
+  };
+
+  const getButtonText = () => {
+    if (isGenerating) return 'Generating...';
+    if (value && value.trim()) return 'Improve with AI';
+    return 'Generate with AI';
   };
 
   return (
@@ -83,7 +131,7 @@ const AiTextHelper = ({
           ) : (
             <Sparkles className="h-4 w-4" />
           )}
-          <span>{isGenerating ? 'Generating...' : 'Generate with AI'}</span>
+          <span>{getButtonText()}</span>
         </Button>
       </div>
       
@@ -104,6 +152,12 @@ const AiTextHelper = ({
               (Need {minLength - value.length} more)
             </span>
           )}
+        </div>
+      )}
+      
+      {!value && (
+        <div className="text-xs text-gray-400">
+          💡 Tip: Start typing your ideas, then click "Generate with AI" to expand and improve your description
         </div>
       )}
     </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -301,7 +300,7 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                 <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black bg-white">
                   <SelectValue placeholder="Select timezone" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-300 z-50 max-h-60">
+                <SelectContent className="bg-white border border-gray-300 z-50">
                   {timezones.map((tz) => (
                     <SelectItem key={tz} value={tz}>
                       {tz} ({formatTimeInTimezone(tz)})
@@ -506,6 +505,12 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
               prompt="Write a compelling description for a yoga class. Include the style, benefits, what students can expect, and any special focus areas."
               minLength={50}
               required
+              formContext={{
+                title: formData.title,
+                category: formData.category === 'custom' ? formData.custom_category : formData.category,
+                difficultyLevel: formData.difficulty_level,
+                duration: formData.duration_minutes
+              }}
             />
           </div>
 
