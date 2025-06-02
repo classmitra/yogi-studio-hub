@@ -15,7 +15,12 @@ export const useInstructor = () => {
   const { data: instructor, isLoading } = useQuery({
     queryKey: ['instructor', user?.id],
     queryFn: async () => {
-      if (!user) return null;
+      if (!user) {
+        console.log('useInstructor - No user found');
+        return null;
+      }
+      
+      console.log('useInstructor - Fetching instructor for user:', user.id);
       
       const { data, error } = await supabase
         .from('instructors')
@@ -24,9 +29,11 @@ export const useInstructor = () => {
         .single();
 
       if (error && error.code !== 'PGRST116') {
+        console.error('useInstructor - Error fetching instructor:', error);
         throw error;
       }
       
+      console.log('useInstructor - Instructor data:', data);
       return data;
     },
     enabled: !!user,
@@ -34,13 +41,20 @@ export const useInstructor = () => {
 
   const createInstructorMutation = useMutation({
     mutationFn: async (data: InstructorInsert) => {
+      console.log('useInstructor - Creating instructor with data:', data);
+      
       const { data: instructor, error } = await supabase
         .from('instructors')
         .insert(data)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('useInstructor - Error creating instructor:', error);
+        throw error;
+      }
+      
+      console.log('useInstructor - Created instructor:', instructor);
       return instructor;
     },
     onSuccess: () => {
@@ -50,7 +64,12 @@ export const useInstructor = () => {
 
   const updateInstructorMutation = useMutation({
     mutationFn: async (data: InstructorUpdate) => {
-      if (!instructor?.id) throw new Error('No instructor found');
+      if (!instructor?.id) {
+        console.error('useInstructor - No instructor found for update');
+        throw new Error('No instructor found');
+      }
+      
+      console.log('useInstructor - Updating instructor:', instructor.id, 'with data:', data);
       
       const { data: updated, error } = await supabase
         .from('instructors')
@@ -59,7 +78,12 @@ export const useInstructor = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('useInstructor - Error updating instructor:', error);
+        throw error;
+      }
+      
+      console.log('useInstructor - Updated instructor:', updated);
       return updated;
     },
     onSuccess: () => {
@@ -80,14 +104,22 @@ export const useInstructor = () => {
 export const useSubdomainCheck = () => {
   const checkSubdomainMutation = useMutation({
     mutationFn: async (subdomain: string) => {
+      console.log('useSubdomainCheck - Checking subdomain availability:', subdomain);
+      
       const { data, error } = await supabase
         .from('instructors')
         .select('subdomain')
         .eq('subdomain', subdomain)
         .maybeSingle();
 
-      if (error) throw error;
-      return !data; // true if available, false if taken
+      if (error) {
+        console.error('useSubdomainCheck - Error checking subdomain:', error);
+        throw error;
+      }
+      
+      const isAvailable = !data;
+      console.log('useSubdomainCheck - Subdomain available:', isAvailable);
+      return isAvailable; // true if available, false if taken
     },
   });
 
