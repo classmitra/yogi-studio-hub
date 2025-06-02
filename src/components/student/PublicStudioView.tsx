@@ -29,8 +29,8 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
     return <StudioNotFound subdomain={subdomain} />;
   }
 
-  // Filter out the placeholder entry if it exists
-  const actualClasses = classes.filter(cls => !cls.isEmpty);
+  // Filter out the placeholder entry if it exists by checking for the id
+  const actualClasses = classes.filter(cls => cls.id !== 'no-classes');
 
   return (
     <>
