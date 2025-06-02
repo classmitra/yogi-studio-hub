@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,6 +19,8 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [bookingClass, setBookingClass] = React.useState<string | null>(null);
+
+  console.log('PublicStudioView loaded with:', { subdomain, classes, isLoading });
 
   const instructor = classes.length > 0 ? classes[0].instructors : null;
 
@@ -89,23 +90,36 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yoga-50 to-ocean-50">
         <div className="text-center">
           <div className="w-8 h-8 bg-gradient-to-br from-yoga-500 to-ocean-500 rounded-lg flex items-center justify-center mx-auto mb-4">
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
           </div>
-          <p className="text-gray-600">Loading studio...</p>
+          <p className="text-gray-600">Loading studio: {subdomain}...</p>
         </div>
       </div>
     );
   }
 
-  if (!instructor) {
+  if (!instructor && classes.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yoga-50 to-ocean-50">
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">🔍</span>
+          </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Studio Not Found</h1>
-          <p className="text-gray-600">The studio you're looking for doesn't exist.</p>
+          <p className="text-gray-600 mb-4">
+            The studio "{subdomain}" doesn't exist or has no classes available.
+          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+            <h3 className="font-semibold text-blue-900 mb-2">Looking for a specific studio?</h3>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• Check the spelling of the studio name</li>
+              <li>• Make sure the studio has published classes</li>
+              <li>• Contact the instructor for the correct link</li>
+            </ul>
+          </div>
         </div>
       </div>
     );
