@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +9,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useClasses } from '@/hooks/useClasses';
 import { useInstructor } from '@/hooks/useInstructor';
 import { useToast } from '@/hooks/use-toast';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Sparkles } from 'lucide-react';
+import AiTextHelper from '@/components/ui/ai-text-helper';
 
 interface ClassFormProps {
   onClose: () => void;
@@ -94,7 +94,7 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
           start_date: formData.start_date,
           duration_minutes: formData.duration_minutes,
           description: formData.description,
-          instructor_email: instructor.email || '',
+          instructor_email: instructor.contact_email || '',
           provider: formData.meeting_provider as 'zoom' | 'google_meet'
         });
       }
@@ -414,14 +414,13 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
 
           <div className="space-y-2">
             <Label htmlFor="description" className="text-sm font-medium text-black">Description*</Label>
-            <Textarea
-              id="description"
+            <AiTextHelper
               value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+              onChange={(value) => handleInputChange('description', value)}
               placeholder="Describe your class, what students can expect..."
-              rows={4}
+              prompt="Write a compelling description for a yoga class. Include the style, benefits, what students can expect, and any special focus areas."
+              minLength={50}
               required
-              className="border-gray-300 focus:border-black focus:ring-black"
             />
           </div>
 
