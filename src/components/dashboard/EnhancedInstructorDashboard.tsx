@@ -18,14 +18,17 @@ import {
   Eye
 } from 'lucide-react';
 import { useInstructor } from '@/hooks/useInstructor';
+import { useClasses } from '@/hooks/useClasses';
 import { useNavigate } from 'react-router-dom';
 import QuickActions from './QuickActions';
 
 const EnhancedInstructorDashboard = () => {
   const { instructor, isLoading } = useInstructor();
+  const { classes, isLoading: classesLoading } = useClasses(instructor?.id);
   const navigate = useNavigate();
 
   console.log('EnhancedInstructorDashboard - instructor data:', instructor);
+  console.log('EnhancedInstructorDashboard - classes data:', classes);
 
   if (isLoading) {
     return (
@@ -64,35 +67,9 @@ const EnhancedInstructorDashboard = () => {
 
   const studioUrl = `${window.location.origin}/studio/${instructor.subdomain}`;
 
-  const upcomingClasses = [
-    {
-      id: 1,
-      title: "Morning Vinyasa Flow",
-      time: "8:00 AM",
-      duration: "60 min",
-      students: 12,
-      maxStudents: 15,
-      type: "Live"
-    },
-    {
-      id: 2,
-      title: "Gentle Yin Yoga",
-      time: "6:00 PM",
-      duration: "90 min",
-      students: 8,
-      maxStudents: 10,
-      type: "Live"
-    },
-    {
-      id: 3,
-      title: "Meditation & Breathwork",
-      time: "7:30 PM",
-      duration: "45 min",
-      students: 20,
-      maxStudents: 25,
-      type: "Live"
-    }
-  ];
+  // Get today's classes
+  const today = new Date().toISOString().split('T')[0];
+  const todaysClasses = classes.filter(cls => cls.start_date === today);
 
   const stats = [
     {
@@ -111,7 +88,7 @@ const EnhancedInstructorDashboard = () => {
     },
     {
       title: "Classes This Week",
-      value: "18",
+      value: classes.length.toString(),
       change: "+2",
       icon: Calendar,
       color: "text-gray-600"
@@ -242,52 +219,74 @@ const EnhancedInstructorDashboard = () => {
                     <CardTitle className="text-xl font-semibold text-black">Today's Classes</CardTitle>
                     <CardDescription className="text-gray-600">Manage your scheduled sessions</CardDescription>
                   </div>
-                  <Button variant="outline" size="sm" className="border-gray-300 text-black hover:bg-gray-50">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="border-gray-300 text-black hover:bg-gray-50"
+                    onClick={() => navigate('/class-schedule')}
+                  >
                     <Calendar className="h-4 w-4 mr-2" />
                     View Calendar
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {upcomingClasses.map((classItem) => (
-                    <div key={classItem.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                      <div className="flex items-center space-x-4">
-                        <div className="text-center">
-                          <p className="text-sm font-medium text-gray-600">TIME</p>
-                          <p className="text-lg font-bold text-black">{classItem.time}</p>
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-black">{classItem.title}</h3>
-                          <div className="flex items-center space-x-4 mt-1">
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Clock className="h-4 w-4 mr-1" />
-                              {classItem.duration}
+                {classesLoading ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600">Loading classes...</p>
+                  </div>
+                ) : todaysClasses.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600">No classes scheduled for today</p>
+                    <Button 
+                      onClick={() => navigate('/class-schedule')}
+                      className="mt-4 bg-black hover:bg-gray-800 text-white"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Schedule a Class
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {todaysClasses.map((classItem) => (
+                      <div key={classItem.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="flex items-center space-x-4">
+                          <div className="text-center">
+                            <p className="text-sm font-medium text-gray-600">TIME</p>
+                            <p className="text-lg font-bold text-black">{classItem.start_time}</p>
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-black">{classItem.title}</h3>
+                            <div className="flex items-center space-x-4 mt-1">
+                              <div className="flex items-center text-sm text-gray-600">
+                                <Clock className="h-4 w-4 mr-1" />
+                                {classItem.duration_minutes} min
+                              </div>
+                              <div className="flex items-center text-sm text-gray-600">
+                                <Users className="h-4 w-4 mr-1" />
+                                0/{classItem.max_students} students
+                              </div>
+                              <Badge variant="secondary" className="bg-gray-100 text-gray-800">
+                                {classItem.category}
+                              </Badge>
                             </div>
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Users className="h-4 w-4 mr-1" />
-                              {classItem.students}/{classItem.maxStudents} students
-                            </div>
-                            <Badge variant="secondary" className="bg-gray-100 text-gray-800">
-                              {classItem.type}
-                            </Badge>
                           </div>
                         </div>
+                        <div className="flex items-center space-x-2">
+                          <Button variant="outline" size="sm" className="border-gray-300 text-black hover:bg-gray-50">
+                            <MessageCircle className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm" className="border-gray-300 text-black hover:bg-gray-50">
+                            <Video className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" className="bg-black hover:bg-gray-800 text-white">
+                            Start Class
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Button variant="outline" size="sm" className="border-gray-300 text-black hover:bg-gray-50">
-                          <MessageCircle className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="sm" className="border-gray-300 text-black hover:bg-gray-50">
-                          <Video className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" className="bg-black hover:bg-gray-800 text-white">
-                          Start Class
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

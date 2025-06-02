@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
+import { useToast } from '@/hooks/use-toast';
 
 type Class = Tables<'classes'>;
 type ClassInsert = TablesInsert<'classes'>;
@@ -9,19 +10,32 @@ type ClassUpdate = TablesUpdate<'classes'>;
 
 export const useClasses = (instructorId?: string) => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: classes, isLoading } = useQuery({
     queryKey: ['classes', instructorId],
     queryFn: async () => {
-      let query = supabase.from('classes').select('*').eq('is_active', true);
+      console.log('useClasses - Fetching classes for instructor:', instructorId);
       
-      if (instructorId) {
-        query = query.eq('instructor_id', instructorId);
+      if (!instructorId) {
+        console.log('useClasses - No instructor ID provided');
+        return [];
       }
+
+      let query = supabase
+        .from('classes')
+        .select('*')
+        .eq('instructor_id', instructorId)
+        .eq('is_active', true);
       
       const { data, error } = await query.order('start_date', { ascending: true });
       
-      if (error) throw error;
+      if (error) {
+        console.error('useClasses - Error fetching classes:', error);
+        throw error;
+      }
+      
+      console.log('useClasses - Fetched classes:', data);
       return data || [];
     },
     enabled: !!instructorId,
@@ -29,18 +43,39 @@ export const useClasses = (instructorId?: string) => {
 
   const createClassMutation = useMutation({
     mutationFn: async (data: ClassInsert) => {
+      console.log('Creating class with data:', data);
+      
       const { data: newClass, error } = await supabase
         .from('classes')
         .insert(data)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating class:', error);
+        throw error;
+      }
+      
+      console.log('Class created successfully:', newClass);
       return newClass;
     },
-    onSuccess: () => {
+    onSuccess: (newClass) => {
+      console.log('Class creation success, invalidating queries');
       queryClient.invalidateQueries({ queryKey: ['classes'] });
       queryClient.invalidateQueries({ queryKey: ['public-classes'] });
+      
+      toast({
+        title: "Class Created",
+        description: `${newClass.title} has been successfully created.`,
+      });
+    },
+    onError: (error) => {
+      console.error('Class creation error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create class. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -59,6 +94,18 @@ export const useClasses = (instructorId?: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['classes'] });
       queryClient.invalidateQueries({ queryKey: ['public-classes'] });
+      
+      toast({
+        title: "Class Updated",
+        description: "Class has been successfully updated.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update class. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -74,6 +121,18 @@ export const useClasses = (instructorId?: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['classes'] });
       queryClient.invalidateQueries({ queryKey: ['public-classes'] });
+      
+      toast({
+        title: "Class Deleted",
+        description: "Class has been successfully deleted.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete class. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
