@@ -1,13 +1,8 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useInstructor } from '@/hooks/useInstructor';
-import { useClasses } from '@/hooks/useClasses';
-import ClassForm from '@/components/classes/ClassForm';
-import BookingManagement from '@/components/dashboard/BookingManagement';
-import QuickActions from '@/components/dashboard/QuickActions';
 import { 
   Calendar, 
   Users, 
@@ -15,92 +10,88 @@ import {
   Clock, 
   Plus,
   TrendingUp,
-  Globe,
-  Edit,
-  Trash2
+  Video,
+  MessageCircle,
+  Settings,
+  BarChart3
 } from 'lucide-react';
+import QuickActions from './QuickActions';
 
 const EnhancedInstructorDashboard = () => {
-  const [showClassForm, setShowClassForm] = useState(false);
-  const [editingClass, setEditingClass] = useState(null);
-  const { instructor } = useInstructor();
-  const { classes, deleteClass } = useClasses(instructor?.id);
-
-  const stats = [
+  const upcomingClasses = [
     {
-      title: "Total Classes",
-      value: classes.length.toString(),
-      change: "+2 this week",
-      icon: Calendar,
-      color: "text-black"
+      id: 1,
+      title: "Morning Vinyasa Flow",
+      time: "8:00 AM",
+      duration: "60 min",
+      students: 12,
+      maxStudents: 15,
+      type: "Live"
     },
     {
-      title: "Active Students",
-      value: "89",
-      change: "+5 new",
-      icon: Users,
-      color: "text-black"
+      id: 2,
+      title: "Gentle Yin Yoga",
+      time: "6:00 PM",
+      duration: "90 min",
+      students: 8,
+      maxStudents: 10,
+      type: "Live"
     },
     {
-      title: "Studio Visits",
-      value: "1,247",
-      change: "+12%",
-      icon: TrendingUp,
-      color: "text-black"
-    },
-    {
-      title: "Total Revenue",
-      value: "$2,840",
-      change: "+18%",
-      icon: DollarSign,
-      color: "text-black"
+      id: 3,
+      title: "Meditation & Breathwork",
+      time: "7:30 PM",
+      duration: "45 min",
+      students: 20,
+      maxStudents: 25,
+      type: "Live"
     }
   ];
 
-  const handleEditClass = (classItem: any) => {
-    setEditingClass(classItem);
-    setShowClassForm(true);
-  };
-
-  const handleDeleteClass = (classId: string) => {
-    if (confirm('Are you sure you want to delete this class?')) {
-      deleteClass(classId);
+  const stats = [
+    {
+      title: "Total Students",
+      value: "247",
+      change: "+12%",
+      icon: Users,
+      color: "text-gray-600"
+    },
+    {
+      title: "Monthly Revenue",
+      value: "$3,240",
+      change: "+23%",
+      icon: DollarSign,
+      color: "text-green-600"
+    },
+    {
+      title: "Classes This Week",
+      value: "18",
+      change: "+2",
+      icon: Calendar,
+      color: "text-gray-600"
+    },
+    {
+      title: "Average Rating",
+      value: "4.9",
+      change: "+0.1",
+      icon: TrendingUp,
+      color: "text-purple-600"
     }
-  };
-
-  const handleShowClassForm = () => {
-    setEditingClass(null);
-    setShowClassForm(true);
-  };
+  ];
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto p-6">
+    <div className="min-h-screen bg-white p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-black mb-2">
-              {instructor?.studio_name || 'Your Studio'}
-            </h1>
-            <p className="text-gray-600">
-              Studio URL: <span className="font-mono text-black">{instructor?.subdomain}.yogastudio.app</span>
-            </p>
+            <h1 className="text-3xl font-bold text-black">Welcome back! 🧘‍♀️</h1>
+            <p className="text-gray-600 mt-1">Here's what's happening in your studio today</p>
           </div>
           <div className="flex items-center space-x-3">
-            <Button 
-              variant="outline" 
-              className="border-black text-black hover:bg-gray-50"
-              onClick={() => window.open(`https://${instructor?.subdomain}.yogastudio.app`, '_blank')}
-            >
-              <Globe className="h-4 w-4 mr-2" />
-              View Studio
-            </Button>
-            <Button 
-              onClick={handleShowClassForm}
-              className="bg-black hover:bg-gray-800 text-white"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              New Class
+            <Button variant="outline" className="flex items-center space-x-2 border-gray-300 text-black hover:bg-gray-50">
+              <Settings className="h-4 w-4" />
+              <span>Studio Settings</span>
             </Button>
           </div>
         </div>
@@ -108,16 +99,16 @@ const EnhancedInstructorDashboard = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (
-            <Card key={index} className="minimal-card">
+            <Card key={index} className="border border-gray-200 shadow-sm bg-white">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
-                    <p className="text-3xl font-bold text-black mb-1">{stat.value}</p>
-                    <p className="text-sm text-gray-500">{stat.change}</p>
+                    <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                    <p className="text-2xl font-bold text-black">{stat.value}</p>
+                    <p className={`text-sm ${stat.color} font-medium`}>{stat.change} from last month</p>
                   </div>
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <stat.icon className="h-6 w-6 text-black" />
+                  <div className={`p-3 rounded-full bg-gray-100`}>
+                    <stat.icon className={`h-6 w-6 ${stat.color}`} />
                   </div>
                 </div>
               </CardContent>
@@ -126,159 +117,96 @@ const EnhancedInstructorDashboard = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Classes Management */}
-          <div className="lg:col-span-2 space-y-8">
-            <Card className="minimal-card">
-              <CardHeader className="border-b border-gray-200">
+          {/* Today's Classes */}
+          <div className="lg:col-span-2">
+            <Card className="border border-gray-200 shadow-sm bg-white">
+              <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-2xl font-bold text-black">Your Classes</CardTitle>
-                    <CardDescription className="text-gray-600">Manage your yoga class schedule</CardDescription>
+                    <CardTitle className="text-xl font-semibold text-black">Today's Classes</CardTitle>
+                    <CardDescription className="text-gray-600">Manage your scheduled sessions</CardDescription>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={handleShowClassForm}
-                    className="border-black text-black hover:bg-gray-50"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Class
+                  <Button variant="outline" size="sm" className="border-gray-300 text-black hover:bg-gray-50">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    View Calendar
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent>
                 <div className="space-y-4">
-                  {classes.map((classItem) => (
+                  {upcomingClasses.map((classItem) => (
                     <div key={classItem.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
                       <div className="flex items-center space-x-4">
-                        <div className="text-center px-3 py-2 bg-white rounded border border-gray-200">
-                          <p className="text-xs font-medium text-gray-600">TIME</p>
-                          <p className="text-lg font-bold text-black">{classItem.start_time}</p>
+                        <div className="text-center">
+                          <p className="text-sm font-medium text-gray-600">TIME</p>
+                          <p className="text-lg font-bold text-black">{classItem.time}</p>
                         </div>
                         <div>
-                          <h3 className="font-semibold text-black text-lg">{classItem.title}</h3>
-                          <div className="flex items-center space-x-4 mt-2">
+                          <h3 className="font-semibold text-black">{classItem.title}</h3>
+                          <div className="flex items-center space-x-4 mt-1">
                             <div className="flex items-center text-sm text-gray-600">
                               <Clock className="h-4 w-4 mr-1" />
-                              {classItem.duration_minutes} min
+                              {classItem.duration}
                             </div>
                             <div className="flex items-center text-sm text-gray-600">
                               <Users className="h-4 w-4 mr-1" />
-                              Max {classItem.max_students}
+                              {classItem.students}/{classItem.maxStudents} students
                             </div>
-                            <Badge variant="secondary" className="bg-white border border-gray-300 text-black">
-                              {classItem.category}
+                            <Badge variant="secondary" className="bg-gray-100 text-gray-800">
+                              {classItem.type}
                             </Badge>
-                            {classItem.price_cents > 0 && (
-                              <Badge variant="outline" className="border-black text-black">
-                                ${(classItem.price_cents / 100).toFixed(2)}
-                              </Badge>
-                            )}
-                            {classItem.price_cents === 0 && (
-                              <Badge variant="outline" className="border-green-600 text-green-600">
-                                Free
-                              </Badge>
-                            )}
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleEditClass(classItem)}
-                          className="border-gray-300 hover:bg-gray-50"
-                        >
-                          <Edit className="h-4 w-4" />
+                        <Button variant="outline" size="sm" className="border-gray-300 text-black hover:bg-gray-50">
+                          <MessageCircle className="h-4 w-4" />
                         </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleDeleteClass(classItem.id)}
-                          className="border-red-300 text-red-600 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
+                        <Button variant="outline" size="sm" className="border-gray-300 text-black hover:bg-gray-50">
+                          <Video className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" className="bg-black hover:bg-gray-800 text-white">
+                          Start Class
                         </Button>
                       </div>
                     </div>
                   ))}
-                  
-                  {classes.length === 0 && (
-                    <div className="text-center py-12">
-                      <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold text-black mb-2">No classes yet</h3>
-                      <p className="text-gray-600 mb-6">Create your first yoga class to get started!</p>
-                      <Button 
-                        onClick={handleShowClassForm}
-                        className="bg-black hover:bg-gray-800 text-white"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Create Your First Class
-                      </Button>
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>
-
-            {/* Booking Management */}
-            <div id="booking-management">
-              <BookingManagement />
-            </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Quick Actions & Recent Activity */}
           <div className="space-y-6">
             {/* Quick Actions */}
-            <QuickActions onShowClassForm={handleShowClassForm} />
+            <QuickActions />
 
-            {/* Studio Info */}
-            <Card className="minimal-card">
-              <CardHeader className="border-b border-gray-200">
-                <CardTitle className="text-lg font-semibold text-black">Studio Information</CardTitle>
+            {/* Recent Activity */}
+            <Card className="border border-gray-200 shadow-sm bg-white">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-black">Recent Activity</CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent>
                 <div className="space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">Studio Name</p>
-                    <p className="text-black font-medium">{instructor?.studio_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">Studio URL</p>
-                    <p className="text-black font-mono text-sm">{instructor?.subdomain}.yogastudio.app</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">Contact Email</p>
-                    <p className="text-black">{instructor?.contact_email || 'Not set'}</p>
-                  </div>
-                  {instructor?.brand_color && (
-                    <div>
-                      <p className="text-sm font-medium text-gray-600 mb-1">Brand Color</p>
-                      <div className="flex items-center space-x-2">
-                        <div 
-                          className="w-4 h-4 rounded border border-gray-300"
-                          style={{ backgroundColor: instructor?.brand_color }}
-                        />
-                        <span className="text-black font-mono text-sm">{instructor?.brand_color}</span>
+                  {[
+                    { action: "New student enrollment", time: "2 minutes ago", type: "success" },
+                    { action: "Payment received - $25", time: "15 minutes ago", type: "success" },
+                    { action: "Class reminder sent", time: "1 hour ago", type: "info" },
+                    { action: "Student feedback received", time: "2 hours ago", type: "info" }
+                  ].map((activity, index) => (
+                    <div key={index} className="flex items-center space-x-3">
+                      <div className={`w-2 h-2 rounded-full ${activity.type === 'success' ? 'bg-green-500' : 'bg-blue-500'}`}></div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-black">{activity.action}</p>
+                        <p className="text-xs text-gray-500">{activity.time}</p>
                       </div>
                     </div>
-                  )}
+                  ))}
                 </div>
               </CardContent>
             </Card>
           </div>
         </div>
-
-        {/* Class Form Modal */}
-        {showClassForm && (
-          <ClassForm
-            onClose={() => {
-              setShowClassForm(false);
-              setEditingClass(null);
-            }}
-            editingClass={editingClass}
-          />
-        )}
       </div>
     </div>
   );
