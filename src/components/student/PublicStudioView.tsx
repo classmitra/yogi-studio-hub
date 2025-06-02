@@ -5,8 +5,7 @@ import WhatsAppWidget from '@/components/WhatsAppWidget';
 import StudentBookingFlow from './StudentBookingFlow';
 import LoadingStudio from './LoadingStudio';
 import StudioNotFound from './StudioNotFound';
-import StudioHeader from './StudioHeader';
-import ClassesGrid from './ClassesGrid';
+import StudioWebsite from './StudioWebsite';
 
 interface PublicStudioViewProps {
   subdomain: string;
@@ -18,42 +17,29 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
 
   console.log('PublicStudioView loaded with:', { subdomain, classes, isLoading });
 
-  const instructor = classes.length > 0 ? classes[0].instructors : null;
-
   if (isLoading) {
     return <LoadingStudio subdomain={subdomain} />;
   }
 
-  if (!instructor && classes.length === 0) {
+  // Check if we have any data (instructor exists)
+  const instructor = classes.length > 0 ? classes[0].instructors : null;
+  
+  // If no instructor found, show not found page
+  if (!instructor) {
     return <StudioNotFound subdomain={subdomain} />;
   }
 
-  return (
-    <div 
-      className="min-h-screen bg-gradient-to-br from-yoga-50 to-ocean-50"
-      style={{ backgroundColor: instructor.brand_color + '10' }}
-    >
-      <StudioHeader 
-        instructor={instructor} 
-        subdomain={subdomain} 
-        classCount={classes.length} 
-      />
+  // Filter out the placeholder entry if it exists
+  const actualClasses = classes.filter(cls => !cls.isEmpty);
 
-      {/* Classes Section */}
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Available Classes</h2>
-            <p className="text-gray-600">Book your class and join our yoga community</p>
-          </div>
-        </div>
-        
-        <ClassesGrid 
-          classes={classes} 
-          instructor={instructor} 
-          onBookNow={setSelectedClass} 
-        />
-      </div>
+  return (
+    <>
+      <StudioWebsite 
+        instructor={instructor}
+        subdomain={subdomain}
+        classes={actualClasses}
+        onBookClass={setSelectedClass}
+      />
 
       {/* Booking Modal */}
       {selectedClass && (
@@ -65,7 +51,7 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
       )}
 
       <WhatsAppWidget />
-    </div>
+    </>
   );
 };
 

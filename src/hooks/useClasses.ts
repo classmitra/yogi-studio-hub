@@ -167,6 +167,10 @@ export const usePublicClasses = (subdomain?: string) => {
       
       if (instructorError) {
         console.error('usePublicClasses - Error fetching instructor:', instructorError);
+        if (instructorError.code === 'PGRST116') {
+          // No instructor found with this subdomain
+          return [];
+        }
         throw instructorError;
       }
       
@@ -188,8 +192,19 @@ export const usePublicClasses = (subdomain?: string) => {
         throw classesError;
       }
       
+      // If no classes but instructor exists, return empty array with instructor info
+      // This allows the studio website to show even without classes
+      if (!classesData || classesData.length === 0) {
+        console.log('usePublicClasses - No classes found, but instructor exists');
+        return [{
+          id: 'no-classes',
+          instructors: instructor,
+          isEmpty: true
+        }];
+      }
+      
       // Add instructor data to each class
-      const classesWithInstructor = (classesData || []).map(classItem => ({
+      const classesWithInstructor = classesData.map(classItem => ({
         ...classItem,
         instructors: instructor
       }));

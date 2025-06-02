@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 import { useInstructor } from '@/hooks/useInstructor';
 import { useClasses } from '@/hooks/useClasses';
 import ClassScheduleHeader from '@/components/schedule/ClassScheduleHeader';
@@ -8,12 +10,14 @@ import ClassScheduleNavigation from '@/components/schedule/ClassScheduleNavigati
 import DayView from '@/components/schedule/DayView';
 import WeekView from '@/components/schedule/WeekView';
 import MonthView from '@/components/schedule/MonthView';
+import ClassForm from '@/components/classes/ClassForm';
 
 const ClassSchedule = () => {
   const { instructor } = useInstructor();
   const { classes, isLoading } = useClasses(instructor?.id);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
+  const [showClassForm, setShowClassForm] = useState(false);
 
   console.log('ClassSchedule - classes:', classes);
 
@@ -35,7 +39,17 @@ const ClassSchedule = () => {
   return (
     <div className="min-h-screen bg-white p-6">
       <div className="max-w-7xl mx-auto">
-        <ClassScheduleHeader viewMode={viewMode} setViewMode={setViewMode} />
+        <div className="flex items-center justify-between mb-6">
+          <ClassScheduleHeader viewMode={viewMode} setViewMode={setViewMode} />
+          <Button 
+            onClick={() => setShowClassForm(true)}
+            className="bg-black hover:bg-gray-800 text-white"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            New Class
+          </Button>
+        </div>
+        
         <ClassScheduleNavigation 
           currentDate={currentDate} 
           setCurrentDate={setCurrentDate} 
@@ -55,6 +69,10 @@ const ClassSchedule = () => {
             )}
           </CardContent>
         </Card>
+
+        {showClassForm && (
+          <ClassForm onClose={() => setShowClassForm(false)} />
+        )}
       </div>
     </div>
   );
