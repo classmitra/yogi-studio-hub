@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,7 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useClasses } from '@/hooks/useClasses';
 import { useInstructor } from '@/hooks/useInstructor';
 import { useToast } from '@/hooks/use-toast';
-import { X, Plus, Sparkles } from 'lucide-react';
+import { X, Plus, Sparkles, DollarSign, Euro, IndianRupee } from 'lucide-react';
 import AiTextHelper from '@/components/ui/ai-text-helper';
 
 interface ClassFormProps {
@@ -22,6 +23,16 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
   const { createClass, updateClass, isCreating, isUpdating } = useClasses(instructor?.id);
   const { toast } = useToast();
 
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   const [formData, setFormData] = useState({
     title: editingClass?.title || '',
     description: editingClass?.description || '',
@@ -31,9 +42,11 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     duration_minutes: editingClass?.duration_minutes || 60,
     max_students: editingClass?.max_students || 10,
     price_cents: editingClass?.price_cents || 0,
+    currency: editingClass?.currency || 'USD',
     start_date: editingClass?.start_date || '',
     start_time: editingClass?.start_time || '',
     end_date: editingClass?.end_date || '',
+    timezone: editingClass?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
     meeting_link: editingClass?.meeting_link || '',
     meeting_provider: editingClass?.meeting_provider || 'zoom',
     auto_create_meeting: true,
@@ -46,7 +59,16 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
 
   const [showCustomCategory, setShowCustomCategory] = useState(false);
 
-  const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const currencies = [
+    { value: 'USD', label: 'USD ($)', icon: DollarSign },
+    { value: 'EUR', label: 'EUR (€)', icon: Euro },
+    { value: 'INR', label: 'INR (₹)', icon: IndianRupee },
+    { value: 'GBP', label: 'GBP (£)', icon: DollarSign },
+    { value: 'CAD', label: 'CAD (C$)', icon: DollarSign },
+    { value: 'AUD', label: 'AUD (A$)', icon: DollarSign },
+    { value: 'JPY', label: 'JPY (¥)', icon: DollarSign },
+    { value: 'SGD', label: 'SGD (S$)', icon: DollarSign },
+  ];
 
   const categories = [
     { value: 'hatha', label: 'Hatha' },
@@ -55,6 +77,24 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     { value: 'meditation', label: 'Meditation' },
     { value: 'pranayama', label: 'Pranayama' },
     { value: 'custom', label: 'Custom Category' }
+  ];
+
+  const timezones = [
+    'UTC',
+    'America/New_York',
+    'America/Los_Angeles',
+    'America/Chicago',
+    'America/Denver',
+    'Europe/London',
+    'Europe/Paris',
+    'Europe/Berlin',
+    'Asia/Tokyo',
+    'Asia/Shanghai',
+    'Asia/Kolkata',
+    'Asia/Dubai',
+    'Australia/Sydney',
+    'Australia/Melbourne',
+    'Pacific/Auckland',
   ];
 
   const daysOfWeek = [
@@ -66,6 +106,35 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     { value: 'saturday', label: 'Saturday' },
     { value: 'sunday', label: 'Sunday' }
   ];
+
+  const formatTimeInTimezone = (timezone: string) => {
+    try {
+      return new Intl.DateTimeFormat('en-US', {
+        timeZone: timezone,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+        timeZoneName: 'short'
+      }).format(currentTime);
+    } catch (error) {
+      return currentTime.toLocaleTimeString();
+    }
+  };
+
+  const getCurrencySymbol = (currency: string) => {
+    const symbols = {
+      USD: '$',
+      EUR: '€',
+      INR: '₹',
+      GBP: '£',
+      CAD: 'C$',
+      AUD: 'A$',
+      JPY: '¥',
+      SGD: 'S$'
+    };
+    return symbols[currency] || '$';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +153,6 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     try {
       let meetingDetails = null;
       
-      // Create meeting if auto-create is enabled and no manual link provided
       if (formData.auto_create_meeting && !formData.meeting_link) {
         const { MeetingIntegrationService } = await import('@/services/meetingIntegration');
         
@@ -112,7 +180,6 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
         recurrence_pattern: formData.is_recurring ? formData.recurrence_pattern : null,
       };
 
-      // Remove fields that shouldn't be sent to the server
       delete classData.custom_category;
       delete classData.auto_create_meeting;
       delete classData.meeting_provider;
@@ -167,7 +234,9 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
               <DialogTitle className="text-2xl font-bold text-black">
                 {editingClass ? 'Edit Class' : 'Create New Class'}
               </DialogTitle>
-              <p className="text-sm text-gray-600 mt-1">Current time: {currentTime}</p>
+              <p className="text-sm text-gray-600 mt-1">
+                Current time ({formData.timezone}): {formatTimeInTimezone(formData.timezone)}
+              </p>
             </div>
             <Button 
               variant="ghost" 
@@ -219,12 +288,28 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                   id="custom_category"
                   value={formData.custom_category}
                   onChange={(e) => handleInputChange('custom_category', e.target.value)}
-                  placeholder="Enter custom category name"
+                  placeholder="Enter custom category name (e.g., Hot Yoga, Ashtanga, Restorative)"
                   required={formData.category === 'custom'}
                   className="border-gray-300 focus:border-black focus:ring-black"
                 />
               </div>
             )}
+
+            <div className="space-y-2">
+              <Label htmlFor="timezone" className="text-sm font-medium text-black">Timezone*</Label>
+              <Select value={formData.timezone} onValueChange={(value) => handleInputChange('timezone', value)}>
+                <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black bg-white">
+                  <SelectValue placeholder="Select timezone" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-300 z-50 max-h-60">
+                  {timezones.map((tz) => (
+                    <SelectItem key={tz} value={tz}>
+                      {tz} ({formatTimeInTimezone(tz)})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="start_date" className="text-sm font-medium text-black">Starts on*</Label>
@@ -473,17 +558,41 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
             </div>
 
             {formData.payment_model === 'standard' && (
-              <div className="space-y-2">
-                <Label htmlFor="price" className="text-sm font-medium text-black">Price ($)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  value={formData.price_cents / 100}
-                  onChange={(e) => handleInputChange('price_cents', Math.round(parseFloat(e.target.value || '0') * 100))}
-                  min="0"
-                  className="border-gray-300 focus:border-black focus:ring-black"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="currency" className="text-sm font-medium text-black">Currency*</Label>
+                  <Select value={formData.currency} onValueChange={(value) => handleInputChange('currency', value)}>
+                    <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black bg-white">
+                      <SelectValue placeholder="Select currency" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-gray-300 z-50">
+                      {currencies.map((currency) => (
+                        <SelectItem key={currency.value} value={currency.value}>
+                          <div className="flex items-center space-x-2">
+                            <currency.icon className="h-4 w-4" />
+                            <span>{currency.label}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="price" className="text-sm font-medium text-black">
+                    Price ({getCurrencySymbol(formData.currency)})
+                  </Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    value={formData.price_cents / 100}
+                    onChange={(e) => handleInputChange('price_cents', Math.round(parseFloat(e.target.value || '0') * 100))}
+                    min="0"
+                    placeholder={`0.00 ${formData.currency}`}
+                    className="border-gray-300 focus:border-black focus:ring-black"
+                  />
+                </div>
               </div>
             )}
           </div>
