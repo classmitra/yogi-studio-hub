@@ -5,83 +5,83 @@
 
 @layer base {
   :root {
-    --background: 250 250 250;
-    --foreground: 20 20 20;
+    --background: 255 255 255;
+    --foreground: 0 0 0;
 
     --card: 255 255 255;
-    --card-foreground: 20 20 20;
+    --card-foreground: 0 0 0;
 
     --popover: 255 255 255;
-    --popover-foreground: 20 20 20;
+    --popover-foreground: 0 0 0;
 
-    --primary: 22 163 74;
+    --primary: 0 0 0;
     --primary-foreground: 255 255 255;
 
-    --secondary: 243 244 246;
-    --secondary-foreground: 17 24 39;
+    --secondary: 245 245 245;
+    --secondary-foreground: 0 0 0;
 
-    --muted: 243 244 246;
-    --muted-foreground: 107 114 128;
+    --muted: 245 245 245;
+    --muted-foreground: 115 115 115;
 
-    --accent: 139 239 172;
-    --accent-foreground: 21 128 61;
+    --accent: 240 240 240;
+    --accent-foreground: 0 0 0;
 
-    --destructive: 239 68 68;
+    --destructive: 0 0 0;
     --destructive-foreground: 255 255 255;
 
-    --border: 229 231 235;
-    --input: 229 231 235;
-    --ring: 22 163 74;
+    --border: 229 229 229;
+    --input: 229 229 229;
+    --ring: 0 0 0;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 255 255 255;
-    --sidebar-foreground: 55 65 81;
-    --sidebar-primary: 22 163 74;
+    --sidebar-foreground: 0 0 0;
+    --sidebar-primary: 0 0 0;
     --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 243 244 246;
-    --sidebar-accent-foreground: 17 24 39;
-    --sidebar-border: 229 231 235;
-    --sidebar-ring: 22 163 74;
+    --sidebar-accent: 245 245 245;
+    --sidebar-accent-foreground: 0 0 0;
+    --sidebar-border: 229 229 229;
+    --sidebar-ring: 0 0 0;
   }
 
   .dark {
-    --background: 9 9 11;
-    --foreground: 250 250 250;
+    --background: 0 0 0;
+    --foreground: 255 255 255;
 
-    --card: 24 24 27;
-    --card-foreground: 250 250 250;
+    --card: 0 0 0;
+    --card-foreground: 255 255 255;
 
-    --popover: 24 24 27;
-    --popover-foreground: 250 250 250;
+    --popover: 0 0 0;
+    --popover-foreground: 255 255 255;
 
-    --primary: 34 197 94;
-    --primary-foreground: 3 7 18;
+    --primary: 255 255 255;
+    --primary-foreground: 0 0 0;
 
-    --secondary: 39 39 42;
-    --secondary-foreground: 250 250 250;
+    --secondary: 20 20 20;
+    --secondary-foreground: 255 255 255;
 
-    --muted: 39 39 42;
-    --muted-foreground: 161 161 170;
+    --muted: 20 20 20;
+    --muted-foreground: 150 150 150;
 
-    --accent: 39 39 42;
-    --accent-foreground: 250 250 250;
+    --accent: 20 20 20;
+    --accent-foreground: 255 255 255;
 
-    --destructive: 220 38 38;
-    --destructive-foreground: 250 250 250;
+    --destructive: 255 255 255;
+    --destructive-foreground: 0 0 0;
 
-    --border: 39 39 42;
-    --input: 39 39 42;
-    --ring: 34 197 94;
+    --border: 38 38 38;
+    --input: 38 38 38;
+    --ring: 255 255 255;
     
-    --sidebar-background: 24 24 27;
-    --sidebar-foreground: 161 161 170;
-    --sidebar-primary: 34 197 94;
-    --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 39 39 42;
-    --sidebar-accent-foreground: 250 250 250;
-    --sidebar-border: 39 39 42;
-    --sidebar-ring: 34 197 94;
+    --sidebar-background: 0 0 0;
+    --sidebar-foreground: 255 255 255;
+    --sidebar-primary: 255 255 255;
+    --sidebar-primary-foreground: 0 0 0;
+    --sidebar-accent: 20 20 20;
+    --sidebar-accent-foreground: 255 255 255;
+    --sidebar-border: 38 38 38;
+    --sidebar-ring: 255 255 255;
   }
 }
 
@@ -97,17 +97,18 @@
 }
 
 @layer components {
-  .yoga-gradient {
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #e0f2fe 100%);
-  }
-  
-  .meditation-gradient {
-    background: linear-gradient(135deg, #fef3c7 0%, #f9a8d4 50%, #c7d2fe 100%);
+  .minimal-gradient {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   }
   
   .glass-effect {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  .minimal-card {
+    @apply bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200;
   }
 }

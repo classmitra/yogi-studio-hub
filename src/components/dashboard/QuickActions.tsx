@@ -1,10 +1,9 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useInstructor } from '@/hooks/useInstructor';
 import { useToast } from '@/hooks/use-toast';
-import ClassForm from '@/components/classes/ClassForm';
 import { 
   Plus,
   Users,
@@ -13,7 +12,8 @@ import {
   BarChart3,
   Video,
   Globe,
-  MessageCircle
+  MessageCircle,
+  HelpCircle
 } from 'lucide-react';
 
 interface QuickActionsProps {
@@ -37,7 +37,6 @@ const QuickActions = ({ onShowClassForm }: QuickActionsProps) => {
   };
 
   const handleViewBookings = () => {
-    // This could scroll to bookings section or open a modal
     document.getElementById('booking-management')?.scrollIntoView({ behavior: 'smooth' });
   };
 
@@ -59,6 +58,20 @@ const QuickActions = ({ onShowClassForm }: QuickActionsProps) => {
     toast({
       title: "Video Setup",
       description: "Add your meeting links when creating classes.",
+    });
+  };
+
+  const handleStudentManagement = () => {
+    toast({
+      title: "Coming Soon",
+      description: "Student management panel will be available soon.",
+    });
+  };
+
+  const handleCalendarView = () => {
+    toast({
+      title: "Coming Soon", 
+      description: "Calendar view coming soon.",
     });
   };
 
@@ -89,7 +102,12 @@ const QuickActions = ({ onShowClassForm }: QuickActionsProps) => {
     {
       title: "Class Calendar",
       icon: Calendar,
-      action: () => toast({ title: "Coming Soon", description: "Calendar view coming soon." })
+      action: handleCalendarView
+    },
+    {
+      title: "Manage Students",
+      icon: Users,
+      action: handleStudentManagement
     },
     {
       title: "Setup Video Calls",
@@ -108,25 +126,25 @@ const QuickActions = ({ onShowClassForm }: QuickActionsProps) => {
     },
     {
       title: "Get Support",
-      icon: MessageCircle,
+      icon: HelpCircle,
       action: handleSupport
     }
   ];
 
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-md">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-gray-900">Quick Actions</CardTitle>
+    <Card className="minimal-card">
+      <CardHeader className="border-b border-gray-200">
+        <CardTitle className="text-lg font-semibold text-black">Quick Actions</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="p-6 space-y-2">
         {quickActions.map((action, index) => (
           <Button
             key={index}
             variant={action.primary ? "default" : "outline"}
             className={`w-full justify-start ${
               action.primary 
-                ? "bg-yoga-600 hover:bg-yoga-700 text-white" 
-                : "hover:bg-yoga-50"
+                ? "bg-black hover:bg-gray-800 text-white" 
+                : "border-gray-300 text-black hover:bg-gray-50"
             }`}
             onClick={action.action}
           >

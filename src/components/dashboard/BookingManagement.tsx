@@ -43,61 +43,64 @@ const BookingManagement = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'bg-green-100 text-green-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'confirmed': return 'bg-green-50 text-green-800 border-green-200';
+      case 'cancelled': return 'bg-red-50 text-red-800 border-red-200';
+      case 'pending': return 'bg-yellow-50 text-yellow-800 border-yellow-200';
+      default: return 'bg-gray-50 text-gray-800 border-gray-200';
     }
   };
 
   const getPaymentStatusColor = (status: string) => {
     switch (status) {
-      case 'paid': return 'bg-green-100 text-green-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'failed': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'paid': return 'bg-green-50 text-green-800 border-green-200';
+      case 'pending': return 'bg-yellow-50 text-yellow-800 border-yellow-200';
+      case 'failed': return 'bg-red-50 text-red-800 border-red-200';
+      default: return 'bg-gray-50 text-gray-800 border-gray-200';
     }
   };
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="minimal-card">
         <CardHeader>
-          <CardTitle>Booking Management</CardTitle>
+          <CardTitle className="text-black">Booking Management</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8">Loading bookings...</div>
+          <div className="text-center py-8">
+            <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading bookings...</p>
+          </div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="minimal-card">
+      <CardHeader className="border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center space-x-2">
+          <CardTitle className="flex items-center space-x-2 text-black">
             <Users className="h-5 w-5" />
             <span>Recent Bookings</span>
           </CardTitle>
-          <Badge variant="outline">{bookings.length} total</Badge>
+          <Badge variant="outline" className="border-black text-black">{bookings.length} total</Badge>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
         {bookings.length === 0 ? (
-          <div className="text-center py-8">
-            <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No bookings yet</h3>
+          <div className="text-center py-12">
+            <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-black mb-2">No bookings yet</h3>
             <p className="text-gray-600">Bookings will appear here once students start booking your classes.</p>
           </div>
         ) : (
           <div className="space-y-4">
             {bookings.slice(0, 5).map((booking) => (
-              <div key={booking.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div key={booking.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex items-center space-x-4">
-                  <div className="text-center">
-                    <p className="text-sm font-medium text-gray-600">DATE</p>
-                    <p className="text-lg font-bold text-yoga-600">
+                  <div className="text-center px-3 py-2 bg-white rounded border border-gray-200">
+                    <p className="text-xs font-medium text-gray-600">DATE</p>
+                    <p className="text-lg font-bold text-black">
                       {new Date(booking.booking_date).toLocaleDateString('en-US', { 
                         month: 'short', 
                         day: 'numeric' 
@@ -105,7 +108,7 @@ const BookingManagement = () => {
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{booking.student_name}</h3>
+                    <h3 className="font-semibold text-black">{booking.student_name}</h3>
                     <p className="text-sm text-gray-600">{booking.student_email}</p>
                     <div className="flex items-center space-x-4 mt-1">
                       <div className="flex items-center text-sm text-gray-600">
@@ -120,10 +123,10 @@ const BookingManagement = () => {
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Badge className={getStatusColor(booking.status)}>
+                  <Badge className={`border ${getStatusColor(booking.status)}`}>
                     {booking.status}
                   </Badge>
-                  <Badge className={getPaymentStatusColor(booking.payment_status)}>
+                  <Badge className={`border ${getPaymentStatusColor(booking.payment_status)}`}>
                     {booking.payment_status}
                   </Badge>
                 </div>
@@ -131,7 +134,9 @@ const BookingManagement = () => {
             ))}
             {bookings.length > 5 && (
               <div className="text-center pt-4">
-                <Button variant="outline">View All Bookings</Button>
+                <Button variant="outline" className="border-black text-black hover:bg-gray-50">
+                  View All Bookings
+                </Button>
               </div>
             )}
           </div>

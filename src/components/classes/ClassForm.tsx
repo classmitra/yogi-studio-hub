@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useClasses } from '@/hooks/useClasses';
 import { useInstructor } from '@/hooks/useInstructor';
 import { useToast } from '@/hooks/use-toast';
+import { X } from 'lucide-react';
 
 interface ClassFormProps {
   onClose: () => void;
@@ -27,7 +28,7 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     difficulty_level: editingClass?.difficulty_level || 'beginner',
     duration_minutes: editingClass?.duration_minutes || 60,
     max_students: editingClass?.max_students || 10,
-    price_cents: editingClass?.price_cents || 2500,
+    price_cents: editingClass?.price_cents || 0,
     start_date: editingClass?.start_date || '',
     start_time: editingClass?.start_time || '',
     meeting_link: editingClass?.meeting_link || '',
@@ -79,31 +80,44 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{editingClass ? 'Edit Class' : 'Create New Class'}</DialogTitle>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white border-2 border-black shadow-2xl">
+        <DialogHeader className="border-b border-gray-200 pb-4">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-2xl font-bold text-black">
+              {editingClass ? 'Edit Class' : 'Create New Class'}
+            </DialogTitle>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onClose}
+              className="hover:bg-gray-100 p-2"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="title">Class Title</Label>
+        <form onSubmit={handleSubmit} className="space-y-6 pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-sm font-medium text-black">Class Title</Label>
               <Input
                 id="title"
                 value={formData.title}
                 onChange={(e) => handleInputChange('title', e.target.value)}
                 placeholder="e.g., Morning Vinyasa Flow"
                 required
+                className="border-gray-300 focus:border-black focus:ring-black"
               />
             </div>
             
-            <div>
-              <Label htmlFor="category">Category</Label>
+            <div className="space-y-2">
+              <Label htmlFor="category" className="text-sm font-medium text-black">Category</Label>
               <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-                <SelectTrigger>
+                <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-300">
                   <SelectItem value="hatha">Hatha</SelectItem>
                   <SelectItem value="vinyasa">Vinyasa</SelectItem>
                   <SelectItem value="yin">Yin</SelectItem>
@@ -113,13 +127,13 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
               </Select>
             </div>
 
-            <div>
-              <Label htmlFor="difficulty">Difficulty Level</Label>
+            <div className="space-y-2">
+              <Label htmlFor="difficulty" className="text-sm font-medium text-black">Difficulty Level</Label>
               <Select value={formData.difficulty_level} onValueChange={(value) => handleInputChange('difficulty_level', value)}>
-                <SelectTrigger>
+                <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black">
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-300">
                   <SelectItem value="beginner">Beginner</SelectItem>
                   <SelectItem value="intermediate">Intermediate</SelectItem>
                   <SelectItem value="advanced">Advanced</SelectItem>
@@ -127,8 +141,8 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
               </Select>
             </div>
 
-            <div>
-              <Label htmlFor="duration">Duration (minutes)</Label>
+            <div className="space-y-2">
+              <Label htmlFor="duration" className="text-sm font-medium text-black">Duration (minutes)</Label>
               <Input
                 id="duration"
                 type="number"
@@ -137,11 +151,12 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                 min="15"
                 max="180"
                 required
+                className="border-gray-300 focus:border-black focus:ring-black"
               />
             </div>
 
-            <div>
-              <Label htmlFor="max_students">Max Students</Label>
+            <div className="space-y-2">
+              <Label htmlFor="max_students" className="text-sm font-medium text-black">Max Students</Label>
               <Input
                 id="max_students"
                 type="number"
@@ -150,74 +165,80 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                 min="1"
                 max="50"
                 required
+                className="border-gray-300 focus:border-black focus:ring-black"
               />
             </div>
 
-            <div>
-              <Label htmlFor="price">Price ($)</Label>
+            <div className="space-y-2">
+              <Label htmlFor="price" className="text-sm font-medium text-black">Price ($) - Optional</Label>
               <Input
                 id="price"
                 type="number"
                 step="0.01"
                 value={formData.price_cents / 100}
-                onChange={(e) => handleInputChange('price_cents', Math.round(parseFloat(e.target.value) * 100))}
+                onChange={(e) => handleInputChange('price_cents', Math.round(parseFloat(e.target.value || '0') * 100))}
                 min="0"
-                required
+                placeholder="0 for free"
+                className="border-gray-300 focus:border-black focus:ring-black"
               />
             </div>
 
-            <div>
-              <Label htmlFor="start_date">Class Date</Label>
+            <div className="space-y-2">
+              <Label htmlFor="start_date" className="text-sm font-medium text-black">Class Date</Label>
               <Input
                 id="start_date"
                 type="date"
                 value={formData.start_date}
                 onChange={(e) => handleInputChange('start_date', e.target.value)}
                 required
+                className="border-gray-300 focus:border-black focus:ring-black"
               />
             </div>
 
-            <div>
-              <Label htmlFor="start_time">Start Time</Label>
+            <div className="space-y-2">
+              <Label htmlFor="start_time" className="text-sm font-medium text-black">Start Time</Label>
               <Input
                 id="start_time"
                 type="time"
                 value={formData.start_time}
                 onChange={(e) => handleInputChange('start_time', e.target.value)}
                 required
+                className="border-gray-300 focus:border-black focus:ring-black"
               />
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="meeting_link">Meeting Link (Optional)</Label>
+          <div className="space-y-2">
+            <Label htmlFor="meeting_link" className="text-sm font-medium text-black">Meeting Link (Optional)</Label>
             <Input
               id="meeting_link"
               value={formData.meeting_link}
               onChange={(e) => handleInputChange('meeting_link', e.target.value)}
               placeholder="Zoom, Google Meet, or other video call link"
+              className="border-gray-300 focus:border-black focus:ring-black"
             />
           </div>
 
-          <div>
-            <Label htmlFor="description">Description</Label>
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-sm font-medium text-black">Description</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               placeholder="Describe your class, what students can expect..."
               rows={4}
+              className="border-gray-300 focus:border-black focus:ring-black"
             />
           </div>
 
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+            <Button type="button" variant="outline" onClick={onClose} className="border-gray-300 text-black hover:bg-gray-50">
               Cancel
             </Button>
             <Button 
               type="submit" 
               disabled={isCreating || isUpdating}
-              className="bg-yoga-600 hover:bg-yoga-700"
+              className="bg-black hover:bg-gray-800 text-white"
             >
               {isCreating || isUpdating ? 'Saving...' : (editingClass ? 'Update Class' : 'Create Class')}
             </Button>
