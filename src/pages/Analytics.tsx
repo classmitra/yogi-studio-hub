@@ -24,40 +24,42 @@ import { useNavigate } from 'react-router-dom';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { useToast } from '@/hooks/use-toast';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 const Analytics = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedMetric, setSelectedMetric] = useState('revenue');
+  const { metrics, revenueTrend, studentGrowth, classPerformance, isLoading } = useAnalytics();
 
-  const metrics = [
+  const metricsData = [
     {
       title: "Total Revenue",
-      value: "$12,430",
-      change: "+23%",
+      value: metrics ? `$${(metrics.total_revenue / 100).toFixed(0)}` : "$0",
+      change: "+23%", // This could be calculated from historical data
       trend: "up",
       icon: DollarSign
     },
     {
       title: "Active Students",
-      value: "247",
+      value: metrics?.total_students?.toString() || "0",
       change: "+12%",
       trend: "up",
       icon: Users
     },
     {
       title: "Classes Taught",
-      value: "86",
+      value: metrics?.total_classes?.toString() || "0",
       change: "+8%",
       trend: "up",
       icon: Calendar
     },
     {
-      title: "Profile Views",
-      value: "1,234",
-      change: "+15%",
+      title: "Average Rating",
+      value: metrics?.avg_rating?.toString() || "0",
+      change: "+0.1",
       trend: "up",
-      icon: Eye
+      icon: Star
     }
   ];
 
@@ -74,49 +76,26 @@ const Analytics = () => {
     { key: 'referrals', label: 'Referral Rate', icon: TrendingUp, color: '#ec4899' }
   ];
 
-  const sampleData = {
-    revenue: [
-      { month: 'Jan', value: 8500 },
-      { month: 'Feb', value: 9200 },
-      { month: 'Mar', value: 10100 },
-      { month: 'Apr', value: 11300 },
-      { month: 'May', value: 12100 },
-      { month: 'Jun', value: 12430 }
-    ],
-    students: [
-      { month: 'Jan', value: 180 },
-      { month: 'Feb', value: 195 },
-      { month: 'Mar', value: 210 },
-      { month: 'Apr', value: 225 },
-      { month: 'May', value: 238 },
-      { month: 'Jun', value: 247 }
-    ],
-    classes: [
-      { month: 'Jan', value: 65 },
-      { month: 'Feb', value: 72 },
-      { month: 'Mar', value: 78 },
-      { month: 'Apr', value: 81 },
-      { month: 'May', value: 84 },
-      { month: 'Jun', value: 86 }
-    ]
+  const getChartData = () => {
+    switch (selectedMetric) {
+      case 'revenue':
+        return revenueTrend || [];
+      case 'students':
+        return studentGrowth || [];
+      default:
+        return revenueTrend || [];
+    }
   };
-
-  const recentClasses = [
-    { name: "Morning Vinyasa", students: 15, revenue: "$375" },
-    { name: "Evening Flow", students: 12, revenue: "$300" },
-    { name: "Gentle Yin", students: 8, revenue: "$200" },
-    { name: "Power Yoga", students: 20, revenue: "$500" }
-  ];
 
   const exportToExcel = () => {
     // Create CSV content
     const csvContent = [
       ['Metric', 'Value', 'Change'],
-      ...metrics.map(m => [m.title, m.value, m.change]),
+      ...metricsData.map(m => [m.title, m.value, m.change]),
       [],
       ['Class Performance'],
       ['Class Name', 'Students', 'Revenue'],
-      ...recentClasses.map(c => [c.name, c.students, c.revenue])
+      ...(classPerformance || []).map(c => [c.name, c.students, c.revenue])
     ].map(row => row.join(',')).join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -143,12 +122,12 @@ const Analytics = () => {
           <h2>Key Metrics</h2>
           <table border="1">
             <tr><th>Metric</th><th>Value</th><th>Change</th></tr>
-            ${metrics.map(m => `<tr><td>${m.title}</td><td>${m.value}</td><td>${m.change}</td></tr>`).join('')}
+            ${metricsData.map(m => `<tr><td>${m.title}</td><td>${m.value}</td><td>${m.change}</td></tr>`).join('')}
           </table>
           <h2>Class Performance</h2>
           <table border="1">
             <tr><th>Class Name</th><th>Students</th><th>Revenue</th></tr>
-            ${recentClasses.map(c => `<tr><td>${c.name}</td><td>${c.students}</td><td>${c.revenue}</td></tr>`).join('')}
+            ${(classPerformance || []).map(c => `<tr><td>${c.name}</td><td>${c.students}</td><td>${c.revenue}</td></tr>`).join('')}
           </table>
         </body>
       </html>
@@ -171,6 +150,19 @@ const Analytics = () => {
       color: growthMetrics.find(m => m.key === selectedMetric)?.color || "#10b981",
     },
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-12">
+            <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading analytics data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white p-6">
@@ -213,7 +205,7 @@ const Analytics = () => {
 
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {metrics.map((metric, index) => (
+          {metricsData.map((metric, index) => (
             <Card key={index} className="border border-gray-200 shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
@@ -248,20 +240,28 @@ const Analytics = () => {
                   <CardTitle className="text-lg font-semibold text-black">Class Performance</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {recentClasses.map((classItem, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <h4 className="font-medium text-black">{classItem.name}</h4>
-                          <p className="text-sm text-gray-600">{classItem.students} students</p>
+                  {!classPerformance || classPerformance.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                      <p className="text-gray-500">No class data available yet</p>
+                      <p className="text-sm text-gray-400">Create classes to see performance metrics</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {classPerformance.slice(0, 5).map((classItem, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div>
+                            <h4 className="font-medium text-black">{classItem.name}</h4>
+                            <p className="text-sm text-gray-600">{classItem.students} students</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-black">{classItem.revenue}</p>
+                            <p className="text-sm text-gray-600">Revenue</p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-black">{classItem.revenue}</p>
-                          <p className="text-sm text-gray-600">Revenue</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -272,7 +272,7 @@ const Analytics = () => {
                 <CardContent>
                   <ChartContainer config={chartConfig} className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={sampleData.revenue}>
+                      <LineChart data={revenueTrend || []}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" />
                         <YAxis />
@@ -320,7 +320,7 @@ const Analytics = () => {
                 
                 <ChartContainer config={chartConfig} className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={sampleData[selectedMetric] || sampleData.revenue}>
+                    <BarChart data={getChartData()}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" />
                       <YAxis />
@@ -345,7 +345,7 @@ const Analytics = () => {
               <CardContent>
                 <ChartContainer config={chartConfig} className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={sampleData.students}>
+                    <LineChart data={studentGrowth || []}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" />
                       <YAxis />

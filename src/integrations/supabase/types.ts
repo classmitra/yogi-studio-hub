@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
+          actual_payment_cents: number | null
           attended: boolean | null
           booking_date: string
           booking_reference: string
@@ -31,6 +32,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          actual_payment_cents?: number | null
           attended?: boolean | null
           booking_date: string
           booking_reference: string
@@ -51,6 +53,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          actual_payment_cents?: number | null
           attended?: boolean | null
           booking_date?: string
           booking_reference?: string
@@ -73,6 +76,13 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "bookings_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_bookings_class_id"
             columns: ["class_id"]
             isOneToOne: false
             referencedRelation: "classes"
@@ -403,6 +413,50 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          booking_id: string | null
+          class_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          instructor_id: string
+          rating: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          class_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          instructor_id: string
+          rating: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          class_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          instructor_id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       studio_settings: {
         Row: {
           created_at: string
@@ -449,6 +503,10 @@ export type Database = {
       generate_booking_reference: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_instructor_metrics: {
+        Args: { instructor_uuid: string }
+        Returns: Json
       }
     }
     Enums: {
