@@ -19,7 +19,8 @@ import {
   Sparkles,
   Heart,
   Mountain,
-  Leaf
+  Leaf,
+  Star
 } from 'lucide-react';
 import { useInstructor } from '@/hooks/useInstructor';
 import { useClasses } from '@/hooks/useClasses';
