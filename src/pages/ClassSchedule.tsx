@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useInstructor } from '@/hooks/useInstructor';
 import { useClasses } from '@/hooks/useClasses';
 import ClassScheduleHeader from '@/components/schedule/ClassScheduleHeader';
@@ -13,6 +14,7 @@ import MonthView from '@/components/schedule/MonthView';
 import ClassForm from '@/components/classes/ClassForm';
 
 const ClassSchedule = () => {
+  const navigate = useNavigate();
   const { instructor } = useInstructor();
   const { classes, isLoading } = useClasses(instructor?.id);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -40,7 +42,17 @@ const ClassSchedule = () => {
     <div className="min-h-screen bg-white p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <ClassScheduleHeader viewMode={viewMode} setViewMode={setViewMode} />
+          <div className="flex items-center space-x-4">
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/dashboard')}
+              className="border-gray-300 text-black hover:bg-gray-50"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Button>
+            <ClassScheduleHeader viewMode={viewMode} setViewMode={setViewMode} />
+          </div>
           <Button 
             onClick={() => setShowClassForm(true)}
             className="bg-black hover:bg-gray-800 text-white"

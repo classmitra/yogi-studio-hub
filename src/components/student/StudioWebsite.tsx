@@ -3,8 +3,9 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Users, Star, MapPin, Mail, Phone, Globe, Instagram, Facebook, Youtube, DollarSign } from 'lucide-react';
+import { Calendar, Clock, Users, Star, MapPin, Mail, Phone, Globe, Instagram, Facebook, Youtube, DollarSign, ArrowLeft, Home } from 'lucide-react';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import PublicClassCard from './PublicClassCard';
 
 interface StudioWebsiteProps {
@@ -15,12 +16,81 @@ interface StudioWebsiteProps {
 }
 
 const StudioWebsite = ({ instructor, subdomain, classes, onBookClass }: StudioWebsiteProps) => {
+  const navigate = useNavigate();
+
   const scrollToClasses = () => {
     document.getElementById('classes-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const scrollToAbout = () => {
+    document.getElementById('about-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToContact = () => {
+    document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-yoga-50 to-ocean-50">
+      {/* Navigation Bar */}
+      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/dashboard')}
+                className="border-gray-300 text-black hover:bg-gray-50"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/')}
+                className="border-gray-300 text-black hover:bg-gray-50"
+              >
+                <Home className="h-4 w-4 mr-2" />
+                Home
+              </Button>
+            </div>
+            
+            <div className="flex items-center space-x-6">
+              <button 
+                onClick={scrollToAbout}
+                className="text-gray-700 hover:text-black transition-colors"
+              >
+                About
+              </button>
+              <button 
+                onClick={scrollToClasses}
+                className="text-gray-700 hover:text-black transition-colors"
+              >
+                Classes
+              </button>
+              {(instructor?.contact_email || instructor?.contact_phone) && (
+                <button 
+                  onClick={scrollToContact}
+                  className="text-gray-700 hover:text-black transition-colors"
+                >
+                  Contact
+                </button>
+              )}
+              <Button 
+                onClick={scrollToClasses}
+                size="sm"
+                style={{ backgroundColor: instructor?.brand_color || '#008cb4' }}
+                className="text-white"
+              >
+                Book Now
+              </Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section */}
       <section className="relative py-20 px-6">
         <div className="max-w-6xl mx-auto">
@@ -84,7 +154,12 @@ const StudioWebsite = ({ instructor, subdomain, classes, onBookClass }: StudioWe
                 </Button>
                 
                 {instructor?.contact_email && (
-                  <Button variant="outline" size="lg" className="px-8 py-3">
+                  <Button 
+                    variant="outline" 
+                    size="lg" 
+                    className="px-8 py-3"
+                    onClick={scrollToContact}
+                  >
                     <Mail className="h-5 w-5 mr-2" />
                     Contact
                   </Button>
@@ -96,7 +171,7 @@ const StudioWebsite = ({ instructor, subdomain, classes, onBookClass }: StudioWe
       </section>
 
       {/* About Section */}
-      <section className="py-16 px-6 bg-white">
+      <section id="about-section" className="py-16 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -106,9 +181,37 @@ const StudioWebsite = ({ instructor, subdomain, classes, onBookClass }: StudioWe
                 Our online classes provide a safe, inclusive space for students of all levels to explore 
                 the transformative power of yoga from the comfort of their own homes.
               </p>
-              <p className="text-lg text-gray-700 leading-relaxed">
+              <p className="text-lg text-gray-700 leading-relaxed mb-6">
                 {instructor?.bio || "Join our community and discover the joy of yoga through expert guidance, mindful movement, and supportive community connection."}
               </p>
+              
+              {/* Features */}
+              <div className="grid grid-cols-2 gap-4 mt-8">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <Users className="h-4 w-4 text-green-600" />
+                  </div>
+                  <span className="text-gray-700">All Levels Welcome</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Clock className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <span className="text-gray-700">Flexible Scheduling</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                    <Star className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <span className="text-gray-700">Expert Instruction</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                    <Globe className="h-4 w-4 text-orange-600" />
+                  </div>
+                  <span className="text-gray-700">Online Community</span>
+                </div>
+              </div>
             </div>
             <div className="relative">
               <img
@@ -120,46 +223,6 @@ const StudioWebsite = ({ instructor, subdomain, classes, onBookClass }: StudioWe
           </div>
         </div>
       </section>
-
-      {/* Contact Information */}
-      {(instructor?.contact_email || instructor?.contact_phone || instructor?.website_url) && (
-        <section className="py-16 px-6 bg-gray-50">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl font-bold text-gray-900 mb-8">Get In Touch</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {instructor?.contact_email && (
-                <Card>
-                  <CardContent className="p-6 text-center">
-                    <Mail className="h-12 w-12 mx-auto mb-4 text-yoga-500" />
-                    <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
-                    <p className="text-gray-600">{instructor.contact_email}</p>
-                  </CardContent>
-                </Card>
-              )}
-              
-              {instructor?.contact_phone && (
-                <Card>
-                  <CardContent className="p-6 text-center">
-                    <Phone className="h-12 w-12 mx-auto mb-4 text-yoga-500" />
-                    <h3 className="font-semibold text-gray-900 mb-2">Phone</h3>
-                    <p className="text-gray-600">{instructor.contact_phone}</p>
-                  </CardContent>
-                </Card>
-              )}
-              
-              {instructor?.website_url && (
-                <Card>
-                  <CardContent className="p-6 text-center">
-                    <Globe className="h-12 w-12 mx-auto mb-4 text-yoga-500" />
-                    <h3 className="font-semibold text-gray-900 mb-2">Website</h3>
-                    <p className="text-gray-600">{instructor.website_url}</p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Classes Section */}
       <section id="classes-section" className="py-16 px-6">
@@ -176,7 +239,7 @@ const StudioWebsite = ({ instructor, subdomain, classes, onBookClass }: StudioWe
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">No Classes Scheduled</h3>
                 <p className="text-gray-600 text-lg mb-6">Check back soon for upcoming classes or contact the studio directly.</p>
                 {instructor?.contact_email && (
-                  <Button variant="outline" size="lg">
+                  <Button variant="outline" size="lg" onClick={scrollToContact}>
                     <Mail className="h-5 w-5 mr-2" />
                     Contact for Class Information
                   </Button>
@@ -197,6 +260,46 @@ const StudioWebsite = ({ instructor, subdomain, classes, onBookClass }: StudioWe
           )}
         </div>
       </section>
+
+      {/* Contact Information */}
+      {(instructor?.contact_email || instructor?.contact_phone || instructor?.website_url) && (
+        <section id="contact-section" className="py-16 px-6 bg-gray-50">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl font-bold text-gray-900 mb-8">Get In Touch</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {instructor?.contact_email && (
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = `mailto:${instructor.contact_email}`}>
+                  <CardContent className="p-6 text-center">
+                    <Mail className="h-12 w-12 mx-auto mb-4 text-yoga-500" />
+                    <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
+                    <p className="text-gray-600">{instructor.contact_email}</p>
+                  </CardContent>
+                </Card>
+              )}
+              
+              {instructor?.contact_phone && (
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = `tel:${instructor.contact_phone}`}>
+                  <CardContent className="p-6 text-center">
+                    <Phone className="h-12 w-12 mx-auto mb-4 text-yoga-500" />
+                    <h3 className="font-semibold text-gray-900 mb-2">Phone</h3>
+                    <p className="text-gray-600">{instructor.contact_phone}</p>
+                  </CardContent>
+                </Card>
+              )}
+              
+              {instructor?.website_url && (
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.open(instructor.website_url, '_blank')}>
+                  <CardContent className="p-6 text-center">
+                    <Globe className="h-12 w-12 mx-auto mb-4 text-yoga-500" />
+                    <h3 className="font-semibold text-gray-900 mb-2">Website</h3>
+                    <p className="text-gray-600">{instructor.website_url}</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Social Media Section */}
       {(instructor?.social_instagram || instructor?.social_facebook || instructor?.social_youtube) && (
@@ -240,6 +343,32 @@ const StudioWebsite = ({ instructor, subdomain, classes, onBookClass }: StudioWe
           </div>
         </section>
       )}
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12 px-6">
+        <div className="max-w-6xl mx-auto text-center">
+          <h3 className="text-2xl font-bold mb-4">{instructor?.studio_name || subdomain}</h3>
+          <p className="text-gray-400 mb-6">Transform your practice, transform your life.</p>
+          <div className="flex justify-center space-x-6">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/dashboard')}
+              className="border-gray-600 text-white hover:bg-gray-800"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/')}
+              className="border-gray-600 text-white hover:bg-gray-800"
+            >
+              <Home className="h-4 w-4 mr-2" />
+              Return Home
+            </Button>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

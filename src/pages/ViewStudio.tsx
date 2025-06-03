@@ -2,17 +2,18 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useInstructor } from '@/hooks/useInstructor';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Eye, Share2, Copy } from 'lucide-react';
+import { ExternalLink, Eye, Share2, Copy, ArrowLeft, Settings, Calendar, Users, BarChart3 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const ViewStudio = () => {
   const { user, loading: authLoading } = useAuth();
   const { instructor, isLoading: instructorLoading } = useInstructor();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   if (authLoading || instructorLoading) {
     return (
@@ -49,14 +50,51 @@ const ViewStudio = () => {
     window.open(studioUrl, '_blank');
   };
 
+  const quickActions = [
+    {
+      icon: Calendar,
+      label: 'Schedule Class',
+      description: 'Create a new class',
+      onClick: () => navigate('/class-schedule')
+    },
+    {
+      icon: Users,
+      label: 'Students',
+      description: 'Manage students',
+      onClick: () => navigate('/students-management')
+    },
+    {
+      icon: BarChart3,
+      label: 'Analytics',
+      description: 'View reports',
+      onClick: () => navigate('/analytics')
+    },
+    {
+      icon: Settings,
+      label: 'Settings',
+      description: 'Studio settings',
+      onClick: () => navigate('/studio-setup')
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-white p-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-black">Your Studio</h1>
-            <p className="text-gray-600 mt-1">Preview and manage your public studio page</p>
+          <div className="flex items-center space-x-4">
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/dashboard')}
+              className="border-gray-300 text-black hover:bg-gray-50"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold text-black">Your Studio</h1>
+              <p className="text-gray-600 mt-1">Preview and manage your public studio page</p>
+            </div>
           </div>
           <div className="flex items-center space-x-3">
             <Button 
@@ -110,8 +148,33 @@ const ViewStudio = () => {
           </CardContent>
         </Card>
 
+        {/* Quick Actions */}
+        <Card className="border border-gray-200 shadow-sm mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-black">Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {quickActions.map((action, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  onClick={action.onClick}
+                  className="h-auto p-4 flex flex-col items-center space-y-2 border-gray-300 text-black hover:bg-gray-50"
+                >
+                  <action.icon className="h-6 w-6" />
+                  <div className="text-center">
+                    <div className="font-medium text-sm">{action.label}</div>
+                    <div className="text-xs text-gray-500">{action.description}</div>
+                  </div>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Studio Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <Card className="border border-gray-200 shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg font-semibold text-black">Studio Details</CardTitle>
@@ -160,7 +223,7 @@ const ViewStudio = () => {
         </div>
 
         {/* Share Options */}
-        <Card className="border border-gray-200 shadow-sm mt-6">
+        <Card className="border border-gray-200 shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-black flex items-center">
               <Share2 className="h-5 w-5 mr-2" />
