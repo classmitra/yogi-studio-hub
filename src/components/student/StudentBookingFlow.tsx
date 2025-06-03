@@ -5,14 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { trackClassBooking } from '@/utils/analytics';
 
 interface StudentBookingFlowProps {
@@ -27,35 +22,41 @@ const StudentBookingFlow = ({ classItem, instructor, onClose }: StudentBookingFl
   const [error, setError] = useState<string | null>(null);
   const [bookingReference, setBookingReference] = useState<string | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleBookingSubmit = async (formData: any) => {
     try {
       setIsLoading(true);
       setError(null);
       
+      // Check if user is authenticated
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to book a class.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       console.log('Creating booking with data:', {
         ...formData,
         class_id: classItem.id,
+        student_id: user.id,
         booking_date: classItem.start_date,
         booking_time: classItem.start_time
       });
-
-      // Generate a temporary student ID (since we don't have user authentication)
-      const tempStudentId = crypto.randomUUID();
-      // Generate a temporary booking reference (will be overwritten by database trigger)
-      const tempBookingReference = 'TEMP-' + Date.now();
 
       const { data, error: bookingError } = await supabase
         .from('bookings')
         .insert({
           class_id: classItem.id,
-          student_id: tempStudentId,
+          student_id: user.id,
           student_name: formData.name,
           student_email: formData.email,
           special_requests: formData.special_requests || null,
           booking_date: classItem.start_date,
           booking_time: classItem.start_time,
-          booking_reference: tempBookingReference, // This will be overwritten by the database trigger
           payment_amount_cents: classItem.price_cents,
           status: 'confirmed'
         })
@@ -93,6 +94,28 @@ const StudentBookingFlow = ({ classItem, instructor, onClose }: StudentBookingFl
     }
   };
 
+  // If user is not authenticated, show login prompt
+  if (!user) {
+    return (
+      <Dialog open onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Authentication Required</DialogTitle>
+            <DialogDescription>
+              Please log in to book this class.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={onClose} variant="outline">Close</Button>
+            <Button onClick={() => window.location.href = '/auth'}>
+              Go to Login
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -109,13 +132,22 @@ const StudentBookingFlow = ({ classItem, instructor, onClose }: StudentBookingFl
               <Label htmlFor="name" className="text-right">
                 Name
               </Label>
-              <Input id="name" defaultValue="" className="col-span-3" />
+              <Input 
+                id="name" 
+                defaultValue={user.user_metadata?.full_name || `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim()} 
+                className="col-span-3" 
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="email" className="text-right">
                 Email
               </Label>
-              <Input id="email" defaultValue="" className="col-span-3" type="email" />
+              <Input 
+                id="email" 
+                defaultValue={user.email || ''} 
+                className="col-span-3" 
+                type="email" 
+              />
             </div>
             <div className="grid grid-cols-4 items-start gap-4">
               <Label htmlFor="special_requests" className="text-right mt-2">
