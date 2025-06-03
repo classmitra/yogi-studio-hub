@@ -87,8 +87,8 @@ export const useScrollAnimations = () => {
       horizontalSections.forEach((section) => {
         const rect = section.getBoundingClientRect();
         if (rect.top < window.innerHeight && rect.bottom > 0) {
-          // Add scroll snap behavior
-          section.scrollBehavior = 'smooth';
+          // Set scroll behavior via style property
+          (section as HTMLElement).style.scrollBehavior = 'smooth';
         }
       });
     };
