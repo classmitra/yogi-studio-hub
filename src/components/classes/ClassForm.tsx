@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -64,9 +63,6 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     visibility_for_ineligible: false,
   });
 
-  const [showCustomCategory, setShowCustomCategory] = useState(false);
-  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
-
   const categories = [
     { value: 'hatha', label: 'Hatha' },
     { value: 'vinyasa', label: 'Vinyasa' },
@@ -103,6 +99,9 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     { value: 'saturday', label: 'Saturday' },
     { value: 'sunday', label: 'Sunday' }
   ];
+
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
   const formatTimeInTimezone = (timezone: string) => {
     try {
@@ -221,7 +220,6 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
         price_cents: Number(formData.price_cents),
         start_date: formData.start_date,
         start_time: formData.start_time,
-        timezone: formData.timezone,
         instructor_id: instructor.id,
         is_active: true,
         meeting_url: meetingDetails?.join_url || formData.meeting_url || null,
