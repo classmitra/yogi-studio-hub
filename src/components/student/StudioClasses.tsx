@@ -19,12 +19,12 @@ const StudioClasses = ({ classes, instructor, onBookClass, onScrollToContact }: 
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-24 fade-in-minimal">
           <h2 className="text-6xl md:text-7xl font-dongle font-normal text-black mb-8 leading-none">
-            Sacred
+            Available
             <br />
-            <span className="text-4xl md:text-5xl opacity-60">Experiences</span>
+            <span className="text-4xl md:text-5xl opacity-60">Classes</span>
           </h2>
           <p className="text-lg text-black/70 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
-            Choose from our mindfully crafted yoga experiences and begin your transformative journey
+            Choose from our classes and start your practice today
           </p>
         </div>
         
@@ -36,9 +36,9 @@ const StudioClasses = ({ classes, instructor, onBookClass, onScrollToContact }: 
                   <Calendar className="h-8 w-8 text-black/60" />
                 </div>
               </div>
-              <h3 className="text-4xl font-dongle font-normal text-black mb-6">Sacred Pause</h3>
+              <h3 className="text-4xl font-dongle font-normal text-black mb-6">New Classes Coming Soon</h3>
               <p className="text-black/70 text-lg mb-12 max-w-md mx-auto leading-relaxed font-light tracking-wide">
-                New experiences are being lovingly prepared. Return soon for upcoming sacred sessions.
+                We're preparing new classes for you. Check back soon or get in touch to be notified.
               </p>
               {instructor?.contact_email && (
                 <Button 
@@ -48,7 +48,7 @@ const StudioClasses = ({ classes, instructor, onBookClass, onScrollToContact }: 
                   className="border border-black bg-transparent text-black hover:bg-black hover:text-white px-8 py-4 text-lg font-light tracking-wide transition-all duration-500"
                 >
                   <Mail className="h-5 w-5 mr-2" />
-                  Connect for Updates
+                  Get Notified
                 </Button>
               )}
             </CardContent>
@@ -90,7 +90,7 @@ const StudioClasses = ({ classes, instructor, onBookClass, onScrollToContact }: 
                       onClick={() => onBookClass(classItem)}
                       className="w-full minimal-button h-12 font-light tracking-wide"
                     >
-                      Book Experience
+                      Book Class
                       <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
                   </CardContent>

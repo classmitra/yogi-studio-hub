@@ -12,7 +12,7 @@ const FooterSection = () => {
               <h3 className="text-2xl font-dongle font-normal text-black tracking-wide">YogaStudio</h3>
             </div>
             <p className="text-black/70 mb-8 leading-relaxed font-light text-sm tracking-wide">
-              Nurturing the sacred connection between ancient wisdom and modern technology for yoga teachers worldwide.
+              Simple tools for yoga teachers to share their practice online. Real connection, modern technology.
             </p>
           </div>
           
@@ -21,8 +21,8 @@ const FooterSection = () => {
             <ul className="space-y-4 text-black/70 text-sm font-light tracking-wide">
               <li><a href="#" className="hover:text-black transition-colors duration-300">Features</a></li>
               <li><a href="#" className="hover:text-black transition-colors duration-300">Getting Started</a></li>
-              <li><a href="#" className="hover:text-black transition-colors duration-300">Integrations</a></li>
-              <li><a href="#" className="hover:text-black transition-colors duration-300">Community</a></li>
+              <li><a href="#" className="hover:text-black transition-colors duration-300">How It Works</a></li>
+              <li><a href="#" className="hover:text-black transition-colors duration-300">Teacher Stories</a></li>
             </ul>
           </div>
           
@@ -30,19 +30,19 @@ const FooterSection = () => {
             <h4 className="font-dongle text-xl font-normal mb-8 text-black tracking-wide">Support</h4>
             <ul className="space-y-4 text-black/70 text-sm font-light tracking-wide">
               <li><a href="#" className="hover:text-black transition-colors duration-300">Help Center</a></li>
-              <li><a href="#" className="hover:text-black transition-colors duration-300">Guides</a></li>
-              <li><a href="#" className="hover:text-black transition-colors duration-300">Contact</a></li>
-              <li><a href="#" className="hover:text-black transition-colors duration-300">Resources</a></li>
+              <li><a href="#" className="hover:text-black transition-colors duration-300">Quick Start Guide</a></li>
+              <li><a href="#" className="hover:text-black transition-colors duration-300">Contact Us</a></li>
+              <li><a href="#" className="hover:text-black transition-colors duration-300">FAQ</a></li>
             </ul>
           </div>
           
           <div className="fade-in-minimal" style={{ animationDelay: '0.3s' }}>
-            <h4 className="font-dongle text-xl font-normal mb-8 text-black tracking-wide">Principles</h4>
+            <h4 className="font-dongle text-xl font-normal mb-8 text-black tracking-wide">Legal</h4>
             <ul className="space-y-4 text-black/70 text-sm font-light tracking-wide">
-              <li><a href="#" className="hover:text-black transition-colors duration-300">Privacy</a></li>
-              <li><a href="#" className="hover:text-black transition-colors duration-300">Terms</a></li>
+              <li><a href="#" className="hover:text-black transition-colors duration-300">Privacy Policy</a></li>
+              <li><a href="#" className="hover:text-black transition-colors duration-300">Terms of Service</a></li>
               <li><a href="#" className="hover:text-black transition-colors duration-300">Accessibility</a></li>
-              <li><a href="#" className="hover:text-black transition-colors duration-300">Sustainability</a></li>
+              <li><a href="#" className="hover:text-black transition-colors duration-300">Security</a></li>
             </ul>
           </div>
         </div>
@@ -53,7 +53,7 @@ const FooterSection = () => {
             <div className="w-1 h-1 bg-black/20"></div>
             <div className="w-1 h-1 bg-black/20"></div>
           </div>
-          <p className="text-xs tracking-widest uppercase">&copy; 2025 YogaStudio Platform. Made with intention for the global yoga community.</p>
+          <p className="text-xs tracking-widest uppercase">&copy; 2025 YogaStudio Platform. Made for teachers, by teachers.</p>
         </div>
       </div>
     </footer>

@@ -57,7 +57,7 @@ const StudioNavigation = ({ onScrollToAbout, onScrollToClasses, onScrollToContac
                 onClick={onScrollToContact}
                 className="text-black hover:opacity-60 transition-opacity duration-300 text-sm tracking-wide font-light"
               >
-                Connect
+                Contact
               </button>
             )}
             <Button 
@@ -65,7 +65,7 @@ const StudioNavigation = ({ onScrollToAbout, onScrollToClasses, onScrollToContac
               size="sm"
               className="minimal-button h-10 px-6 font-light tracking-wide"
             >
-              Book Experience
+              Book Class
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </div>

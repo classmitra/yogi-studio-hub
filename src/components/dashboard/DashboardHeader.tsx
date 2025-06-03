@@ -21,10 +21,10 @@ const DashboardHeader = ({ instructor }: DashboardHeaderProps) => {
             <div className="w-2 h-2 bg-black"></div>
           </div>
           <h1 className="text-6xl font-dongle font-normal text-black leading-none">
-            Welcome back, sacred teacher
+            Welcome back
           </h1>
         </div>
-        <p className="text-black/70 text-lg leading-relaxed font-light tracking-wide">Here's the beautiful energy flowing through your studio today</p>
+        <p className="text-black/70 text-lg leading-relaxed font-light tracking-wide">Here's what's happening in your studio today</p>
         {instructor.subdomain && (
           <div className="mt-6 flex items-center space-x-6">
             <div className="flex items-center space-x-4">
@@ -44,7 +44,7 @@ const DashboardHeader = ({ instructor }: DashboardHeaderProps) => {
           className="flex items-center space-x-2 border-black bg-transparent text-black hover:bg-black hover:text-white transition-all duration-500 font-light tracking-wide"
         >
           <Eye className="h-4 w-4" />
-          <span>View Sacred Space</span>
+          <span>View Studio</span>
           <ExternalLink className="h-3 w-3" />
         </Button>
         <Button 
@@ -53,7 +53,7 @@ const DashboardHeader = ({ instructor }: DashboardHeaderProps) => {
           className="flex items-center space-x-2 border-black bg-transparent text-black hover:bg-black hover:text-white transition-all duration-500 font-light tracking-wide"
         >
           <Settings className="h-4 w-4" />
-          <span>Sacred Settings</span>
+          <span>Studio Settings</span>
         </Button>
       </div>
     </div>

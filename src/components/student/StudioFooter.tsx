@@ -23,7 +23,7 @@ const StudioFooter = ({ instructor, subdomain }: StudioFooterProps) => {
         <div className="fade-in-minimal">
           <h3 className="text-5xl md:text-6xl font-dongle font-normal mb-8 leading-none">{instructor?.studio_name || subdomain}</h3>
           <p className="text-xl text-white/70 mb-12 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
-            Where sacred practice meets mindful technology, creating ripples of peace across the world.
+            Simple yoga classes for everyone. Move better, breathe deeper, feel balanced.
           </p>
           
           <div className="flex justify-center space-x-8 mb-12">
@@ -33,7 +33,7 @@ const StudioFooter = ({ instructor, subdomain }: StudioFooterProps) => {
               className="border border-white bg-transparent text-white hover:bg-white hover:text-black transition-all duration-500 font-light tracking-wide"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Return to Dashboard
+              Back to Dashboard
             </Button>
             <Button
               variant="outline"
@@ -41,7 +41,7 @@ const StudioFooter = ({ instructor, subdomain }: StudioFooterProps) => {
               className="border border-white bg-transparent text-white hover:bg-white hover:text-black transition-all duration-500 font-light tracking-wide"
             >
               <Home className="h-4 w-4 mr-2" />
-              Sacred Home
+              Home
             </Button>
           </div>
           
@@ -52,7 +52,7 @@ const StudioFooter = ({ instructor, subdomain }: StudioFooterProps) => {
           </div>
           
           <p className="text-white/50 text-xs tracking-widest uppercase">
-            Made with intention • {new Date().getFullYear()}
+            Made for teachers • {new Date().getFullYear()}
           </p>
         </div>
       </div>

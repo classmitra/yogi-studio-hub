@@ -17,38 +17,38 @@ const FeaturesSection = () => {
   const features = [
     {
       icon: Globe,
-      title: "Digital Space",
-      description: "Your own corner of the internet with yourname.yogastudio.app",
+      title: "Your Online Studio",
+      description: "Get your own website at yourname.yogastudio.app",
       delay: "0s"
     },
     {
       icon: Calendar,
-      title: "Scheduling",
-      description: "Harmonious calendar flow with gentle reminders",
+      title: "Easy Scheduling",
+      description: "Simple booking system with automatic reminders",
       delay: "0.1s"
     },
     {
       icon: CreditCard,
-      title: "Payments",
-      description: "Accept offerings with dignity or share freely",
+      title: "Simple Payments",
+      description: "Accept payments securely or offer classes for free",
       delay: "0.2s"
     },
     {
       icon: Video,
-      title: "Connection",
-      description: "Crystal-clear video for authentic presence",
+      title: "Live Classes",
+      description: "High-quality video for real connection with students",
       delay: "0.3s"
     },
     {
       icon: Users,
-      title: "Community",
-      description: "Nurture relationships with meaningful tools",
+      title: "Student Management",
+      description: "Keep track of your community with simple tools",
       delay: "0.4s"
     },
     {
       icon: Star,
-      title: "Growth",
-      description: "Organic marketing that honors connections",
+      title: "Grow Your Practice",
+      description: "Marketing tools that help students find you",
       delay: "0.5s"
     }
   ];
@@ -63,7 +63,7 @@ const FeaturesSection = () => {
             <span className="text-5xl md:text-6xl opacity-60">You Need</span>
           </h2>
           <p className="text-lg text-black/70 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
-            Thoughtfully crafted tools that honor the sacred practice of yoga while embracing modern simplicity.
+            Simple tools to teach yoga online. No complicated setup, no learning curve.
           </p>
         </div>
         

@@ -56,7 +56,7 @@ const StudioHero = ({ instructor, subdomain, classes, onScrollToClasses, onScrol
             <div className="mb-8">
               <Badge variant="secondary" className="bg-transparent border border-black text-black mb-6 font-light tracking-wide">
                 <Minus className="h-3 w-3 mr-2" />
-                Sacred Practice Space
+                Online Yoga Studio
                 <Minus className="h-3 w-3 ml-2" />
               </Badge>
             </div>
@@ -74,11 +74,11 @@ const StudioHero = ({ instructor, subdomain, classes, onScrollToClasses, onScrol
             <div className="flex flex-wrap gap-6 justify-center lg:justify-start mb-12">
               <Badge variant="secondary" className="text-sm px-6 py-3 bg-transparent border border-black/20 text-black/70 font-light tracking-wide">
                 <MapPin className="h-4 w-4 mr-2" />
-                Online Space
+                Online Classes
               </Badge>
               <Badge variant="secondary" className="text-sm px-6 py-3 bg-transparent border border-black/20 text-black/70 font-light tracking-wide">
                 <Calendar className="h-4 w-4 mr-2" />
-                {classes.length} Experiences
+                {classes.length} Classes Available
               </Badge>
               <Badge variant="secondary" className="text-sm px-6 py-3 bg-transparent border border-black/20 text-black/70 font-light tracking-wide">
                 <Globe className="h-4 w-4 mr-2" />
@@ -93,7 +93,7 @@ const StudioHero = ({ instructor, subdomain, classes, onScrollToClasses, onScrol
                 className="minimal-button h-14 px-10 text-lg font-light tracking-wide"
               >
                 <Calendar className="h-5 w-5 mr-3" />
-                Explore Experiences
+                Browse Classes
               </Button>
               
               {instructor?.contact_email && (
@@ -104,7 +104,7 @@ const StudioHero = ({ instructor, subdomain, classes, onScrollToClasses, onScrol
                   onClick={onScrollToContact}
                 >
                   <Mail className="h-5 w-5 mr-3" />
-                  Connect
+                  Get in Touch
                 </Button>
               )}
             </div>

@@ -37,24 +37,22 @@ const HeroSection = ({ onScrollToFeatures }: HeroSectionProps) => {
           <div className="fade-in-minimal">
             <Badge variant="secondary" className="mb-12 px-8 py-3 text-sm font-light bg-transparent border border-black text-black tracking-wide">
               <Minus className="h-3 w-3 mr-3" />
-              Free Forever — Trusted by 10,000+ Teachers
+              Free to start — Trusted by 10,000+ teachers
               <Minus className="h-3 w-3 ml-3" />
             </Badge>
           </div>
           
           <div className="slide-up-minimal" style={{ animationDelay: '0.2s' }}>
             <h1 className="text-8xl md:text-9xl lg:text-[12rem] font-dongle font-normal text-black mb-16 leading-none tracking-tight">
-              Your
+              Online Yoga
               <br />
-              Sacred
-              <br />
-              <span className="text-6xl md:text-7xl lg:text-8xl opacity-60">Space</span>
+              <span className="text-6xl md:text-7xl lg:text-8xl opacity-60">Made Simple</span>
             </h1>
           </div>
           
           <div className="slide-up-minimal" style={{ animationDelay: '0.4s' }}>
             <p className="text-xl md:text-2xl text-black/70 mb-16 leading-relaxed max-w-2xl mx-auto font-light tracking-wide">
-              Create your serene online sanctuary where ancient wisdom meets modern simplicity.
+              Book live and on-demand classes from real teachers. Anytime, anywhere.
             </p>
           </div>
           
@@ -63,7 +61,7 @@ const HeroSection = ({ onScrollToFeatures }: HeroSectionProps) => {
               size="lg" 
               className="minimal-button h-14 px-12 text-lg font-light tracking-wide"
             >
-              Begin Journey
+              Find a Teacher
               <ArrowRight className="ml-3 h-5 w-5" />
             </Button>
             <Button 
@@ -72,13 +70,13 @@ const HeroSection = ({ onScrollToFeatures }: HeroSectionProps) => {
               className="border border-black bg-transparent text-black hover:bg-black hover:text-white h-14 px-12 text-lg font-light tracking-wide transition-all duration-500"
             >
               <Play className="mr-3 h-5 w-5" />
-              Watch Story
+              How It Works
             </Button>
           </div>
           
           <div className="slide-up-minimal mt-16" style={{ animationDelay: '0.8s' }}>
             <p className="text-xs text-black/50 mb-16 tracking-widest uppercase">
-              No commitment — 2-minute setup — Cancel anytime
+              Start in 2 minutes — No commitments
             </p>
           </div>
 

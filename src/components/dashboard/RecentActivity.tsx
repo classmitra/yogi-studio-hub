@@ -5,16 +5,16 @@ import { Heart, DollarSign, Calendar, Star } from 'lucide-react';
 
 const RecentActivity = () => {
   const activities = [
-    { action: "New soul joined the community", time: "2 minutes ago", type: "success", icon: Heart },
-    { action: "Sacred offering received - $25", time: "15 minutes ago", type: "success", icon: DollarSign },
-    { action: "Gentle reminder sent to souls", time: "1 hour ago", type: "info", icon: Calendar },
-    { action: "Beautiful feedback received", time: "2 hours ago", type: "info", icon: Star }
+    { action: "New student joined your studio", time: "2 minutes ago", type: "success", icon: Heart },
+    { action: "Payment received - $25", time: "15 minutes ago", type: "success", icon: DollarSign },
+    { action: "Class reminder sent", time: "1 hour ago", type: "info", icon: Calendar },
+    { action: "5-star review received", time: "2 hours ago", type: "info", icon: Star }
   ];
 
   return (
     <Card className="border border-black/10 bg-white slide-up-minimal" style={{ animationDelay: '0.4s' }}>
       <CardHeader>
-        <CardTitle className="text-2xl font-dongle font-normal text-black tracking-wide">Sacred Energy Flow</CardTitle>
+        <CardTitle className="text-2xl font-dongle font-normal text-black tracking-wide">Recent Activity</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-8">

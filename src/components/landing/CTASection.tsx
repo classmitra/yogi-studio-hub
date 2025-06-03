@@ -14,12 +14,12 @@ const CTASection = () => {
       <div className="container mx-auto px-8 text-center relative z-10">
         <div className="fade-in-minimal">
           <h2 className="text-7xl md:text-8xl font-dongle font-normal mb-12 leading-none">
-            Ready to Create
+            Ready to
             <br />
-            <span className="text-5xl md:text-6xl opacity-60">Your Space?</span>
+            <span className="text-5xl md:text-6xl opacity-60">Start Teaching?</span>
           </h2>
           <p className="text-xl mb-16 opacity-80 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
-            Join thousands of mindful teachers who have transformed their practice into a thriving online sanctuary.
+            Join thousands of teachers who have made yoga accessible to students worldwide.
           </p>
         </div>
         
@@ -28,7 +28,7 @@ const CTASection = () => {
             size="lg" 
             className="bg-white text-black hover:bg-white/90 h-14 px-12 text-lg font-light tracking-wide transition-all duration-500"
           >
-            Start Your Journey
+            Get Started Free
             <ArrowRight className="ml-3 h-5 w-5" />
           </Button>
           <Button 
@@ -37,13 +37,13 @@ const CTASection = () => {
             className="border border-white bg-transparent text-white hover:bg-white hover:text-black h-14 px-12 text-lg font-light tracking-wide transition-all duration-500"
           >
             <Calendar className="mr-3 h-5 w-5" />
-            Schedule Call
+            Book a Demo
           </Button>
         </div>
         
         <div className="fade-in-minimal mt-16" style={{ animationDelay: '0.4s' }}>
           <p className="text-xs opacity-60 tracking-widest uppercase">
-            Always Free — No Commitments — Begin in Moments
+            Always Free — No Setup Fees — Start Teaching Today
           </p>
         </div>
       </div>
