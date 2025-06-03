@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useInstructor } from './useInstructor';
@@ -18,7 +17,13 @@ export const useAnalytics = () => {
       });
       
       if (error) throw error;
-      return data as InstructorMetrics;
+      
+      // Type guard to ensure data matches InstructorMetrics structure
+      if (data && typeof data === 'object' && !Array.isArray(data)) {
+        return data as InstructorMetrics;
+      }
+      
+      return null;
     },
     enabled: !!instructor?.id,
   });
