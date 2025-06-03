@@ -12,32 +12,17 @@ import {
   Star,
   CheckCircle,
   Play,
-  Heart,
-  Zap,
   ChevronDown,
-  Sparkles,
-  Leaf,
-  Mountain
+  ArrowRight,
+  Minus,
+  Plus
 } from 'lucide-react';
-import { useScrollAnimations } from '@/hooks/useScrollAnimations';
+import { useScrollAnimations, useStaggeredAnimation } from '@/hooks/useScrollAnimations';
 
 const LandingPage = () => {
   const heroRef = useRef<HTMLDivElement>(null);
+  const staggerRef = useStaggeredAnimation(150);
   useScrollAnimations();
-
-  useEffect(() => {
-    // Add scroll progress indicator
-    const progressBar = document.createElement('div');
-    progressBar.className = 'scroll-progress';
-    document.body.appendChild(progressBar);
-
-    return () => {
-      const existingBar = document.querySelector('.scroll-progress');
-      if (existingBar) {
-        existingBar.remove();
-      }
-    };
-  }, []);
 
   const scrollToFeatures = () => {
     document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -45,21 +30,22 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
+      {/* Scroll Progress */}
+      <div className="scroll-progress-minimal"></div>
+
       {/* Sticky Navigation */}
-      <nav className="sticky-nav">
-        <div className="container mx-auto px-4 py-3">
+      <nav className="sticky-nav-minimal">
+        <div className="container mx-auto px-8 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-sage-400 rounded-full flex items-center justify-center">
-                <Leaf className="h-4 w-4 text-white" />
-              </div>
-              <span className="font-cormorant text-xl font-semibold text-earth-800">YogaStudio</span>
+            <div className="flex items-center space-x-3">
+              <div className="w-2 h-2 bg-black"></div>
+              <span className="font-dongle text-2xl font-normal text-black tracking-wide">YogaStudio</span>
             </div>
-            <div className="flex items-center space-x-6">
-              <a href="#features" className="text-earth-600 hover:text-sage-600 transition-colors">Features</a>
-              <a href="#testimonials" className="text-earth-600 hover:text-sage-600 transition-colors">Stories</a>
-              <a href="#pricing" className="text-earth-600 hover:text-sage-600 transition-colors">Pricing</a>
-              <Button className="bg-sage-500 hover:bg-sage-600 text-white ripple-effect">
+            <div className="hidden md:flex items-center space-x-12">
+              <a href="#features" className="text-black hover:opacity-60 transition-opacity duration-300 text-sm tracking-wide">Features</a>
+              <a href="#testimonials" className="text-black hover:opacity-60 transition-opacity duration-300 text-sm tracking-wide">Stories</a>
+              <a href="#pricing" className="text-black hover:opacity-60 transition-opacity duration-300 text-sm tracking-wide">Pricing</a>
+              <Button className="minimal-button h-10 px-6 text-sm font-light tracking-wide">
                 Start Free
               </Button>
             </div>
@@ -67,165 +53,151 @@ const LandingPage = () => {
         </div>
       </nav>
 
-      {/* Hero Section with Immersive Background */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center wellness-gradient overflow-hidden">
+      {/* Hero Section */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center section-white" data-section="white">
         {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div 
-            className="absolute top-10 left-10 w-64 h-64 bg-sage-200/30 rounded-full blur-3xl float"
-            data-parallax="0.3"
-          ></div>
-          <div 
-            className="absolute bottom-20 right-20 w-96 h-96 bg-sand-200/20 rounded-full blur-3xl"
-            data-parallax="0.2"
-          ></div>
-          <div 
-            className="absolute top-1/2 left-1/4 w-32 h-32 bg-earth-200/20 rounded-full blur-2xl breathe"
-            data-parallax="0.4"
-          ></div>
+          <div className="absolute top-20 right-20 w-1 h-32 bg-black opacity-10 parallax-slow"></div>
+          <div className="absolute bottom-40 left-20 w-1 h-24 bg-black opacity-5 parallax-medium"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-px h-96 bg-gradient-to-b from-transparent via-black/5 to-transparent parallax-fast"></div>
         </div>
 
-        {/* Nature Elements */}
+        {/* Minimal geometric shapes */}
         <div className="absolute inset-0 pointer-events-none">
-          <Mountain className="absolute top-20 right-1/4 h-32 w-32 text-sage-200/30 parallax-slow" />
-          <Leaf className="absolute bottom-32 left-1/3 h-16 w-16 text-earth-200/40 gentle-pulse" />
-          <Sparkles className="absolute top-1/3 right-1/3 h-12 w-12 text-sand-300/50 float" />
+          <div className="absolute top-32 left-1/4 w-1 h-1 bg-black breathe-minimal"></div>
+          <div className="absolute bottom-32 right-1/3 w-1 h-1 bg-black gentle-fade"></div>
+          <div className="absolute top-2/3 right-1/4 w-px h-16 bg-black/20 float-minimal"></div>
         </div>
 
-        <div className="container mx-auto px-4 py-20 relative z-10">
+        <div className="container mx-auto px-8 py-32 relative z-10">
           <div className="text-center max-w-5xl mx-auto">
-            <div className="fade-in-up">
-              <Badge variant="secondary" className="mb-8 px-8 py-3 text-base font-medium bg-white/80 text-sage-700 border border-sage-200/50 backdrop-blur-sm">
-                <Sparkles className="h-4 w-4 mr-2" />
-                Free Forever • Trusted by 10,000+ Teachers
+            <div className="fade-in-minimal">
+              <Badge variant="secondary" className="mb-12 px-8 py-3 text-sm font-light bg-transparent border border-black text-black tracking-wide">
+                <Minus className="h-3 w-3 mr-3" />
+                Free Forever — Trusted by 10,000+ Teachers
+                <Minus className="h-3 w-3 ml-3" />
               </Badge>
             </div>
             
-            <div className="fade-in-up" style={{ animationDelay: '0.2s' }}>
-              <h1 className="text-7xl md:text-9xl font-cormorant font-light text-earth-800 mb-8 leading-tight tracking-tight">
-                Your Sacred
+            <div className="slide-up-minimal" style={{ animationDelay: '0.2s' }}>
+              <h1 className="text-8xl md:text-9xl lg:text-[12rem] font-dongle font-normal text-black mb-16 leading-none tracking-tight">
+                Your
                 <br />
-                <span className="font-semibold text-sage-600">Yoga Space</span>
+                Sacred
                 <br />
-                <span className="text-6xl md:text-7xl text-stone-500">Awaits</span>
+                <span className="text-6xl md:text-7xl lg:text-8xl opacity-60">Space</span>
               </h1>
             </div>
             
-            <div className="fade-in-up" style={{ animationDelay: '0.4s' }}>
-              <p className="text-2xl text-earth-600 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
-                Create your serene online sanctuary where ancient wisdom meets modern technology. 
-                Build deeper connections with students worldwide through your personalized yoga studio.
+            <div className="slide-up-minimal" style={{ animationDelay: '0.4s' }}>
+              <p className="text-xl md:text-2xl text-black/70 mb-16 leading-relaxed max-w-2xl mx-auto font-light tracking-wide">
+                Create your serene online sanctuary where ancient wisdom meets modern simplicity.
               </p>
             </div>
             
-            <div className="fade-in-up flex flex-col sm:flex-row gap-6 justify-center items-center" style={{ animationDelay: '0.6s' }}>
+            <div className="slide-up-minimal flex flex-col sm:flex-row gap-8 justify-center items-center" style={{ animationDelay: '0.6s' }}>
               <Button 
                 size="lg" 
-                className="bg-sage-500 hover:bg-sage-600 text-white px-12 py-6 text-xl rounded-2xl ripple-effect hover-lift font-medium"
+                className="minimal-button h-14 px-12 text-lg font-light tracking-wide"
               >
-                Begin Your Journey
-                <Heart className="ml-3 h-6 w-6" />
+                Begin Journey
+                <ArrowRight className="ml-3 h-5 w-5" />
               </Button>
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="border-2 border-earth-300 text-earth-700 hover:bg-earth-50 px-12 py-6 text-xl rounded-2xl hover-lift font-medium"
+                className="border border-black bg-transparent text-black hover:bg-black hover:text-white h-14 px-12 text-lg font-light tracking-wide transition-all duration-500"
               >
-                <Play className="mr-3 h-6 w-6" />
+                <Play className="mr-3 h-5 w-5" />
                 Watch Story
               </Button>
             </div>
             
-            <div className="fade-in-up mt-8" style={{ animationDelay: '0.8s' }}>
-              <p className="text-sm text-earth-500 mb-8">
-                No credit card • 2-minute setup • Cancel anytime
+            <div className="slide-up-minimal mt-16" style={{ animationDelay: '0.8s' }}>
+              <p className="text-xs text-black/50 mb-16 tracking-widest uppercase">
+                No commitment — 2-minute setup — Cancel anytime
               </p>
             </div>
 
             {/* Scroll Indicator */}
-            <div className="fade-in-up absolute bottom-12 left-1/2 transform -translate-x-1/2 cursor-pointer" style={{ animationDelay: '1s' }} onClick={scrollToFeatures}>
-              <div className="flex flex-col items-center text-earth-500 hover:text-sage-600 transition-colors">
-                <span className="text-sm font-medium mb-2">Discover More</span>
-                <ChevronDown className="h-6 w-6 animate-bounce-gentle" />
+            <div className="slide-up-minimal absolute bottom-16 left-1/2 transform -translate-x-1/2 cursor-pointer" style={{ animationDelay: '1s' }} onClick={scrollToFeatures}>
+              <div className="flex flex-col items-center text-black/60 hover:text-black transition-colors duration-300">
+                <div className="w-px h-8 bg-black/30 mb-4"></div>
+                <ChevronDown className="h-4 w-4" />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section with Organic Layout */}
-      <section id="features-section" className="py-32 sage-gradient relative">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-20 fade-in-up">
-            <h2 className="text-6xl font-cormorant font-semibold text-earth-800 mb-8">
-              Everything for Your
-              <span className="text-sage-600"> Teaching Journey</span>
+      {/* Features Section */}
+      <section id="features-section" className="py-32 section-off-white" data-section="off-white">
+        <div className="container mx-auto px-8">
+          <div className="text-center mb-24 fade-in-minimal">
+            <h2 className="text-7xl md:text-8xl font-dongle font-normal text-black mb-8 leading-none">
+              Everything
+              <br />
+              <span className="text-5xl md:text-6xl opacity-60">You Need</span>
             </h2>
-            <p className="text-xl text-earth-600 max-w-3xl mx-auto leading-relaxed">
-              Thoughtfully crafted tools that honor the sacred practice of yoga while embracing modern convenience.
+            <p className="text-lg text-black/70 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
+              Thoughtfully crafted tools that honor the sacred practice of yoga while embracing modern simplicity.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-7xl mx-auto">
+          <div ref={staggerRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-16 max-w-6xl mx-auto">
             {[
               {
                 icon: Globe,
-                title: "Sacred Digital Space",
-                description: "Your own mindful corner of the internet with yourname.yogastudio.app",
-                color: "sage",
+                title: "Digital Space",
+                description: "Your own corner of the internet with yourname.yogastudio.app",
                 delay: "0s"
               },
               {
                 icon: Calendar,
-                title: "Intuitive Scheduling",
-                description: "Harmonious calendar flow with gentle reminders and peaceful booking",
-                color: "earth",
+                title: "Scheduling",
+                description: "Harmonious calendar flow with gentle reminders",
                 delay: "0.1s"
               },
               {
                 icon: CreditCard,
-                title: "Graceful Payments",
-                description: "Accept offerings with dignity or share your practice freely",
-                color: "sand",
+                title: "Payments",
+                description: "Accept offerings with dignity or share freely",
                 delay: "0.2s"
               },
               {
                 icon: Video,
-                title: "Seamless Connection",
-                description: "Crystal-clear video integration for authentic online presence",
-                color: "stone",
+                title: "Connection",
+                description: "Crystal-clear video for authentic presence",
                 delay: "0.3s"
               },
               {
                 icon: Users,
-                title: "Community Building",
-                description: "Nurture relationships with meaningful student management tools",
-                color: "sage",
+                title: "Community",
+                description: "Nurture relationships with meaningful tools",
                 delay: "0.4s"
               },
               {
-                icon: Zap,
-                title: "Mindful Growth",
-                description: "Organic marketing tools that honor authentic connections",
-                color: "earth",
+                icon: Star,
+                title: "Growth",
+                description: "Organic marketing that honors connections",
                 delay: "0.5s"
               }
             ].map((feature, index) => (
               <Card 
                 key={index} 
-                className={`group glass-card hover-lift scale-in border-0 shadow-lg bg-white/70 backdrop-blur-xl`}
+                className="stagger-in group border border-black/10 bg-white hover:border-black/30 transition-all duration-500 minimal-hover"
                 style={{ animationDelay: feature.delay }}
               >
-                <CardHeader className="text-center pb-6">
-                  <div className="relative mx-auto mb-6">
-                    <div className={`w-20 h-20 rounded-3xl bg-${feature.color}-100 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 breathe`}>
-                      <feature.icon className={`h-10 w-10 text-${feature.color}-600`} />
+                <CardHeader className="text-center pb-8">
+                  <div className="relative mx-auto mb-8">
+                    <div className="w-16 h-16 border border-black/20 flex items-center justify-center mx-auto group-hover:border-black/60 transition-all duration-500">
+                      <feature.icon className="h-6 w-6 text-black/60" />
                     </div>
                   </div>
-                  <CardTitle className="text-2xl font-cormorant font-semibold text-earth-800">{feature.title}</CardTitle>
+                  <CardTitle className="text-2xl font-dongle font-normal text-black tracking-wide">{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-earth-600 text-center leading-relaxed">{feature.description}</p>
+                  <p className="text-black/70 text-center leading-relaxed font-light text-sm tracking-wide">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -233,78 +205,60 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Testimonials with Parallax */}
-      <section id="testimonials" className="py-32 earth-gradient relative overflow-hidden">
-        <div 
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: '60px 60px'
-          }}
-        ></div>
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-20 fade-in-up">
-            <h2 className="text-6xl font-cormorant font-semibold text-earth-800 mb-8">
+      {/* Testimonials with Horizontal Scroll */}
+      <section id="testimonials" className="py-32 section-light-gray" data-section="light-gray">
+        <div className="container mx-auto px-8">
+          <div className="text-center mb-24 fade-in-minimal">
+            <h2 className="text-7xl md:text-8xl font-dongle font-normal text-black mb-8 leading-none">
               Stories of
-              <span className="text-sage-600"> Transformation</span>
+              <br />
+              <span className="text-5xl md:text-6xl opacity-60">Transformation</span>
             </h2>
-            <p className="text-xl text-earth-600">
+            <p className="text-lg text-black/70 font-light tracking-wide">
               Voices from our global community of mindful teachers
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+          <div className="horizontal-scroll gap-8 pb-8 fade-in-minimal">
             {[
               {
                 name: "Sarah Chen",
                 role: "Vinyasa Flow Teacher",
                 content: "This platform became my digital sanctuary. The interface feels as peaceful as my physical studio, and I've grown from 10 local students to 300+ souls worldwide.",
-                rating: 5,
-                image: "🧘‍♀️",
                 location: "California, USA",
-                delay: "0s"
               },
               {
                 name: "Amara Okafor",
                 role: "Restorative Yoga Guide",
                 content: "The gentle design and intuitive flow mirror the essence of yoga itself. My students often say booking feels like a meditation in itself.",
-                rating: 5,
-                image: "🌸",
                 location: "Lagos, Nigeria",
-                delay: "0.2s"
               },
               {
                 name: "Luna Patel",
                 role: "Yin & Meditation Teacher",
                 content: "Having my own sacred digital space gave me the confidence to share my practice globally. The customization options let my personality shine through.",
-                rating: 5,
-                image: "🌙",
                 location: "Mumbai, India",
-                delay: "0.4s"
               }
             ].map((testimonial, index) => (
               <Card 
                 key={index} 
-                className={`glass-card hover-lift fade-in-up bg-white/80 border-0 shadow-xl backdrop-blur-xl`}
-                style={{ animationDelay: testimonial.delay }}
+                className="w-80 md:w-96 flex-shrink-0 border border-black/10 bg-white minimal-hover"
               >
-                <CardContent className="p-10">
-                  <div className="flex items-center mb-6">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 fill-sand-400 text-sand-400" />
-                    ))}
+                <CardContent className="p-12">
+                  <div className="flex items-center mb-8">
+                    <div className="w-1 h-1 bg-black mr-2"></div>
+                    <div className="w-1 h-1 bg-black mr-2"></div>
+                    <div className="w-1 h-1 bg-black mr-2"></div>
+                    <div className="w-1 h-1 bg-black mr-2"></div>
+                    <div className="w-1 h-1 bg-black"></div>
                   </div>
-                  <p className="text-earth-700 mb-8 italic text-lg leading-relaxed font-light">
+                  <p className="text-black/80 mb-12 text-lg leading-relaxed font-light tracking-wide">
                     "{testimonial.content}"
                   </p>
-                  <div className="flex items-center">
-                    <div className="text-4xl mr-4">{testimonial.image}</div>
-                    <div>
-                      <h4 className="font-cormorant text-xl font-semibold text-earth-800">{testimonial.name}</h4>
-                      <p className="text-earth-600 text-sm">{testimonial.role}</p>
-                      <p className="text-earth-500 text-xs">{testimonial.location}</p>
-                    </div>
+                  <div>
+                    <h4 className="font-dongle text-2xl font-normal text-black tracking-wide">{testimonial.name}</h4>
+                    <p className="text-black/60 text-sm font-light tracking-wide">{testimonial.role}</p>
+                    <p className="text-black/40 text-xs font-light tracking-widest uppercase">{testimonial.location}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -314,104 +268,102 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 bg-gradient-to-br from-sage-800 to-earth-900 text-white relative overflow-hidden">
+      <section className="py-32 bg-black text-white relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-sage-300/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 left-20 w-1 h-32 bg-white/10 parallax-slow"></div>
+          <div className="absolute bottom-20 right-20 w-1 h-24 bg-white/5 parallax-medium"></div>
         </div>
         
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <div className="fade-in-up">
-            <h2 className="text-6xl font-cormorant font-semibold mb-8">
-              Ready to Create Your
+        <div className="container mx-auto px-8 text-center relative z-10">
+          <div className="fade-in-minimal">
+            <h2 className="text-7xl md:text-8xl font-dongle font-normal mb-12 leading-none">
+              Ready to Create
               <br />
-              <span className="text-sage-300">Sacred Digital Space?</span>
+              <span className="text-5xl md:text-6xl opacity-60">Your Space?</span>
             </h2>
-            <p className="text-xl mb-12 opacity-90 max-w-3xl mx-auto leading-relaxed">
-              Join thousands of mindful teachers who have transformed their practice into a thriving online sanctuary. 
-              Your journey begins with a single breath.
+            <p className="text-xl mb-16 opacity-80 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
+              Join thousands of mindful teachers who have transformed their practice into a thriving online sanctuary.
             </p>
           </div>
           
-          <div className="fade-in-up flex flex-col sm:flex-row gap-6 justify-center items-center" style={{ animationDelay: '0.2s' }}>
+          <div className="fade-in-minimal flex flex-col sm:flex-row gap-8 justify-center items-center" style={{ animationDelay: '0.2s' }}>
             <Button 
               size="lg" 
-              variant="secondary" 
-              className="bg-white text-earth-800 hover:bg-sage-50 px-12 py-6 text-xl rounded-2xl ripple-effect hover-lift font-medium"
+              className="bg-white text-black hover:bg-white/90 h-14 px-12 text-lg font-light tracking-wide transition-all duration-500"
             >
-              Start Your Sacred Journey
-              <Heart className="ml-3 h-6 w-6" />
+              Start Your Journey
+              <ArrowRight className="ml-3 h-5 w-5" />
             </Button>
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-6 text-xl rounded-2xl hover-lift font-medium backdrop-blur-sm"
+              className="border border-white bg-transparent text-white hover:bg-white hover:text-black h-14 px-12 text-lg font-light tracking-wide transition-all duration-500"
             >
-              <Calendar className="mr-3 h-6 w-6" />
-              Schedule a Call
+              <Calendar className="mr-3 h-5 w-5" />
+              Schedule Call
             </Button>
           </div>
           
-          <div className="fade-in-up mt-8" style={{ animationDelay: '0.4s' }}>
-            <p className="text-sm opacity-75 mb-8">
-              Always Free • No Sacred Commitments • Begin in Moments
+          <div className="fade-in-minimal mt-16" style={{ animationDelay: '0.4s' }}>
+            <p className="text-xs opacity-60 tracking-widest uppercase">
+              Always Free — No Commitments — Begin in Moments
             </p>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-earth-50 text-earth-700 py-20 border-t border-earth-200">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-12">
-            <div className="fade-in-up">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-sage-400 rounded-full flex items-center justify-center">
-                  <Leaf className="h-5 w-5 text-white" />
-                </div>
-                <h3 className="text-2xl font-cormorant font-semibold text-earth-800">YogaStudio</h3>
+      <footer className="bg-white text-black py-24 border-t border-black/10">
+        <div className="container mx-auto px-8">
+          <div className="grid md:grid-cols-4 gap-16">
+            <div className="fade-in-minimal">
+              <div className="flex items-center space-x-3 mb-8">
+                <div className="w-2 h-2 bg-black"></div>
+                <h3 className="text-2xl font-dongle font-normal text-black tracking-wide">YogaStudio</h3>
               </div>
-              <p className="text-earth-600 mb-6 leading-relaxed">
+              <p className="text-black/70 mb-8 leading-relaxed font-light text-sm tracking-wide">
                 Nurturing the sacred connection between ancient wisdom and modern technology for yoga teachers worldwide.
               </p>
-              <div className="text-3xl space-x-3">
-                🧘‍♀️ 🌿 ✨ 🕉️
-              </div>
             </div>
             
-            <div className="fade-in-up" style={{ animationDelay: '0.1s' }}>
-              <h4 className="font-cormorant text-xl font-semibold mb-6 text-earth-800">Platform</h4>
-              <ul className="space-y-3 text-earth-600">
-                <li><a href="#" className="hover:text-sage-600 transition-colors">Sacred Features</a></li>
-                <li><a href="#" className="hover:text-sage-600 transition-colors">Getting Started</a></li>
-                <li><a href="#" className="hover:text-sage-600 transition-colors">Integrations</a></li>
-                <li><a href="#" className="hover:text-sage-600 transition-colors">Community</a></li>
+            <div className="fade-in-minimal" style={{ animationDelay: '0.1s' }}>
+              <h4 className="font-dongle text-xl font-normal mb-8 text-black tracking-wide">Platform</h4>
+              <ul className="space-y-4 text-black/70 text-sm font-light tracking-wide">
+                <li><a href="#" className="hover:text-black transition-colors duration-300">Features</a></li>
+                <li><a href="#" className="hover:text-black transition-colors duration-300">Getting Started</a></li>
+                <li><a href="#" className="hover:text-black transition-colors duration-300">Integrations</a></li>
+                <li><a href="#" className="hover:text-black transition-colors duration-300">Community</a></li>
               </ul>
             </div>
             
-            <div className="fade-in-up" style={{ animationDelay: '0.2s' }}>
-              <h4 className="font-cormorant text-xl font-semibold mb-6 text-earth-800">Support</h4>
-              <ul className="space-y-3 text-earth-600">
-                <li><a href="#" className="hover:text-sage-600 transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-sage-600 transition-colors">Mindful Guides</a></li>
-                <li><a href="#" className="hover:text-sage-600 transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-sage-600 transition-colors">Teacher Resources</a></li>
+            <div className="fade-in-minimal" style={{ animationDelay: '0.2s' }}>
+              <h4 className="font-dongle text-xl font-normal mb-8 text-black tracking-wide">Support</h4>
+              <ul className="space-y-4 text-black/70 text-sm font-light tracking-wide">
+                <li><a href="#" className="hover:text-black transition-colors duration-300">Help Center</a></li>
+                <li><a href="#" className="hover:text-black transition-colors duration-300">Guides</a></li>
+                <li><a href="#" className="hover:text-black transition-colors duration-300">Contact</a></li>
+                <li><a href="#" className="hover:text-black transition-colors duration-300">Resources</a></li>
               </ul>
             </div>
             
-            <div className="fade-in-up" style={{ animationDelay: '0.3s' }}>
-              <h4 className="font-cormorant text-xl font-semibold mb-6 text-earth-800">Sacred Principles</h4>
-              <ul className="space-y-3 text-earth-600">
-                <li><a href="#" className="hover:text-sage-600 transition-colors">Privacy & Trust</a></li>
-                <li><a href="#" className="hover:text-sage-600 transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-sage-600 transition-colors">Accessibility</a></li>
-                <li><a href="#" className="hover:text-sage-600 transition-colors">Sustainability</a></li>
+            <div className="fade-in-minimal" style={{ animationDelay: '0.3s' }}>
+              <h4 className="font-dongle text-xl font-normal mb-8 text-black tracking-wide">Principles</h4>
+              <ul className="space-y-4 text-black/70 text-sm font-light tracking-wide">
+                <li><a href="#" className="hover:text-black transition-colors duration-300">Privacy</a></li>
+                <li><a href="#" className="hover:text-black transition-colors duration-300">Terms</a></li>
+                <li><a href="#" className="hover:text-black transition-colors duration-300">Accessibility</a></li>
+                <li><a href="#" className="hover:text-black transition-colors duration-300">Sustainability</a></li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-earth-300 mt-16 pt-8 text-center text-earth-600 fade-in-up" style={{ animationDelay: '0.4s' }}>
-            <p>&copy; 2025 YogaStudio Platform. Made with 💚 and mindfulness for the global yoga community.</p>
+          <div className="border-t border-black/10 mt-16 pt-12 text-center text-black/60 fade-in-minimal" style={{ animationDelay: '0.4s' }}>
+            <div className="flex items-center justify-center space-x-4 mb-4">
+              <div className="w-1 h-1 bg-black/20"></div>
+              <div className="w-1 h-1 bg-black/20"></div>
+              <div className="w-1 h-1 bg-black/20"></div>
+            </div>
+            <p className="text-xs tracking-widest uppercase">&copy; 2025 YogaStudio Platform. Made with intention for the global yoga community.</p>
           </div>
         </div>
       </footer>
