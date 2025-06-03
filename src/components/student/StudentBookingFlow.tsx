@@ -39,12 +39,21 @@ const StudentBookingFlow = ({ classItem, instructor, onClose }: StudentBookingFl
         return;
       }
 
+      // Generate booking reference using the database function
+      const { data: refData, error: refError } = await supabase.rpc('generate_booking_reference');
+      
+      if (refError) {
+        console.error('Error generating booking reference:', refError);
+        throw refError;
+      }
+
       console.log('Creating booking with data:', {
         ...formData,
         class_id: classItem.id,
         student_id: user.id,
         booking_date: classItem.start_date,
-        booking_time: classItem.start_time
+        booking_time: classItem.start_time,
+        booking_reference: refData
       });
 
       const { data, error: bookingError } = await supabase
@@ -57,6 +66,7 @@ const StudentBookingFlow = ({ classItem, instructor, onClose }: StudentBookingFl
           special_requests: formData.special_requests || null,
           booking_date: classItem.start_date,
           booking_time: classItem.start_time,
+          booking_reference: refData,
           payment_amount_cents: classItem.price_cents,
           status: 'confirmed'
         })
