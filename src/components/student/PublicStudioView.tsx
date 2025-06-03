@@ -1,6 +1,8 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { usePublicClasses } from '@/hooks/useClasses';
+import { updateSEO, generateStudioSEO, generateStructuredData } from '@/utils/seo';
+import { trackStudioVisit } from '@/utils/analytics';
 import WhatsAppWidget from '@/components/WhatsAppWidget';
 import StudentBookingFlow from './StudentBookingFlow';
 import LoadingStudio from './LoadingStudio';
@@ -17,12 +19,26 @@ const PublicStudioView = ({ subdomain }: PublicStudioViewProps) => {
 
   console.log('PublicStudioView loaded with:', { subdomain, classes, isLoading });
 
+  // Check if we have any data (instructor exists)
+  const instructor = classes.length > 0 ? classes[0].instructors : null;
+
+  useEffect(() => {
+    if (instructor) {
+      // Update SEO for the studio page
+      const seoData = generateStudioSEO(instructor, subdomain);
+      updateSEO(seoData);
+      
+      // Generate structured data for the organization
+      generateStructuredData('Organization', instructor);
+      
+      // Track studio visit
+      trackStudioVisit(subdomain);
+    }
+  }, [instructor, subdomain]);
+
   if (isLoading) {
     return <LoadingStudio subdomain={subdomain} />;
   }
-
-  // Check if we have any data (instructor exists)
-  const instructor = classes.length > 0 ? classes[0].instructors : null;
   
   // If no instructor found, show not found page
   if (!instructor) {
