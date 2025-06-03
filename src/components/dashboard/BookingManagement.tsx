@@ -92,7 +92,7 @@ const BookingManagement = () => {
                         ${(booking.payment_amount_cents / 100).toFixed(2)}
                       </div>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">{booking.classes.title}</p>
+                    <p className="text-xs text-gray-500 mt-1">{booking.classes?.title || 'Class Title'}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">

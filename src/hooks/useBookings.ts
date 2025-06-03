@@ -46,9 +46,9 @@ export const useBookings = () => {
           special_requests,
           attended,
           created_at,
-          classes!inner(
+          classes!bookings_class_id_fkey(
             title,
-            instructors!inner(
+            instructors!classes_instructor_id_fkey(
               studio_name
             )
           )

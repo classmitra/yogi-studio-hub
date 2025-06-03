@@ -2,6 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useInstructor } from './useInstructor';
+import type { InstructorMetrics } from '@/types/analytics';
 
 export const useAnalytics = () => {
   const { instructor } = useInstructor();
@@ -9,7 +10,7 @@ export const useAnalytics = () => {
   // Get instructor metrics using the database function
   const { data: metrics, isLoading: metricsLoading } = useQuery({
     queryKey: ['instructor-metrics', instructor?.id],
-    queryFn: async () => {
+    queryFn: async (): Promise<InstructorMetrics | null> => {
       if (!instructor?.id) return null;
       
       const { data, error } = await supabase.rpc('get_instructor_metrics', {
@@ -17,7 +18,7 @@ export const useAnalytics = () => {
       });
       
       if (error) throw error;
-      return data;
+      return data as InstructorMetrics;
     },
     enabled: !!instructor?.id,
   });
@@ -36,7 +37,7 @@ export const useAnalytics = () => {
         .select(`
           booking_date,
           payment_amount_cents,
-          classes!inner(instructor_id)
+          classes!bookings_class_id_fkey(instructor_id)
         `)
         .eq('classes.instructor_id', instructor.id)
         .eq('status', 'confirmed')
@@ -81,7 +82,7 @@ export const useAnalytics = () => {
         .select(`
           booking_date,
           student_id,
-          classes!inner(instructor_id)
+          classes!bookings_class_id_fkey(instructor_id)
         `)
         .eq('classes.instructor_id', instructor.id)
         .eq('status', 'confirmed')
@@ -131,7 +132,7 @@ export const useAnalytics = () => {
         .select(`
           id,
           title,
-          bookings!inner(
+          bookings!bookings_class_id_fkey(
             id,
             status,
             payment_amount_cents
@@ -170,7 +171,7 @@ export const useAnalytics = () => {
           student_name,
           student_email,
           payment_amount_cents,
-          classes!inner(
+          classes!bookings_class_id_fkey(
             title,
             instructor_id
           )
