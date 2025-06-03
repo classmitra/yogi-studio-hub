@@ -103,6 +103,20 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
   const [showCustomCategory, setShowCustomCategory] = useState(false);
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
+  // Helper function to convert day names to integers
+  const convertDaysToIntegers = (dayNames: string[]): number[] => {
+    const dayMap: { [key: string]: number } = {
+      'sunday': 0,
+      'monday': 1,
+      'tuesday': 2,
+      'wednesday': 3,
+      'thursday': 4,
+      'friday': 5,
+      'saturday': 6
+    };
+    return dayNames.map(day => dayMap[day]).filter(num => num !== undefined);
+  };
+
   const formatTimeInTimezone = (timezone: string) => {
     try {
       return new Intl.DateTimeFormat('en-US', {
@@ -206,9 +220,13 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
           });
         } catch (meetingError) {
           console.warn('Failed to create meeting automatically:', meetingError);
-          // Continue without meeting link rather than failing the entire class creation
         }
       }
+
+      // Convert recurrence_days from strings to integers
+      const recurrenceDaysAsIntegers = formData.is_recurring && formData.recurrence_pattern === 'weekly' 
+        ? convertDaysToIntegers(formData.recurrence_days) 
+        : null;
 
       const classData = {
         title: formData.title.trim(),
@@ -226,7 +244,7 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
         meeting_id: meetingDetails?.meeting_id || null,
         meeting_password: meetingDetails?.password || null,
         end_date: formData.is_recurring && formData.end_date ? formData.end_date : null,
-        recurrence_days: formData.is_recurring && formData.recurrence_pattern === 'weekly' ? formData.recurrence_days : null,
+        recurrence_days: recurrenceDaysAsIntegers,
         recurrence_pattern: formData.is_recurring ? formData.recurrence_pattern : null,
         is_recurring: formData.is_recurring,
       };
