@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,6 +35,12 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     return () => clearInterval(timer);
   }, []);
 
+  // Get today's date in YYYY-MM-DD format for minimum date
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
   const [formData, setFormData] = useState({
     title: editingClass?.title || '',
     description: editingClass?.description || '',
@@ -43,9 +50,9 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     duration_minutes: editingClass?.duration_minutes || 60,
     max_students: editingClass?.max_students || 10,
     price_cents: editingClass?.price_cents || 0,
-    start_date: editingClass?.start_date || '',
-    start_time: editingClass?.start_time || '',
-    end_date: editingClass?.end_date || '', // This should be blank by default
+    start_date: editingClass?.start_date || getTodayDate(),
+    start_time: editingClass?.start_time || '09:00',
+    end_date: editingClass?.end_date || '',
     timezone: editingClass?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
     meeting_url: editingClass?.meeting_url || '',
     meeting_provider: editingClass?.meeting_provider || 'zoom',
@@ -58,6 +65,7 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
   });
 
   const [showCustomCategory, setShowCustomCategory] = useState(false);
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
   const categories = [
     { value: 'hatha', label: 'Hatha' },
@@ -111,6 +119,53 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     }
   };
 
+  const validateForm = () => {
+    const errors: {[key: string]: string} = {};
+
+    if (!formData.title.trim()) {
+      errors.title = 'Title is required';
+    }
+
+    if (!formData.description.trim()) {
+      errors.description = 'Description is required';
+    }
+
+    if (formData.category === 'custom' && !formData.custom_category.trim()) {
+      errors.custom_category = 'Custom category name is required';
+    }
+
+    if (!formData.start_date) {
+      errors.start_date = 'Start date is required';
+    }
+
+    if (!formData.start_time) {
+      errors.start_time = 'Start time is required';
+    }
+
+    if (formData.duration_minutes < 15 || formData.duration_minutes > 180) {
+      errors.duration_minutes = 'Duration must be between 15 and 180 minutes';
+    }
+
+    if (formData.max_students < 1 || formData.max_students > 50) {
+      errors.max_students = 'Max students must be between 1 and 50';
+    }
+
+    if (formData.price_cents < 0) {
+      errors.price_cents = 'Price cannot be negative';
+    }
+
+    if (formData.is_recurring && formData.recurrence_pattern === 'weekly' && formData.recurrence_days.length === 0) {
+      errors.recurrence_days = 'Select at least one day for weekly recurrence';
+    }
+
+    if (formData.is_recurring && formData.end_date && formData.end_date <= formData.start_date) {
+      errors.end_date = 'End date must be after start date';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -123,33 +178,47 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
       return;
     }
 
+    if (!validateForm()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fix the errors in the form.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const finalCategory = formData.category === 'custom' ? formData.custom_category : formData.category;
 
     try {
       let meetingDetails = null;
       
       if (formData.auto_create_meeting && !formData.meeting_url) {
-        const { MeetingIntegrationService } = await import('@/services/meetingIntegration');
-        
-        meetingDetails = await MeetingIntegrationService.createMeeting({
-          title: formData.title,
-          start_time: formData.start_time,
-          start_date: formData.start_date,
-          duration_minutes: formData.duration_minutes,
-          description: formData.description,
-          instructor_email: instructor.contact_email || '',
-          provider: formData.meeting_provider as 'zoom' | 'google_meet'
-        });
+        try {
+          const { MeetingIntegrationService } = await import('@/services/meetingIntegration');
+          
+          meetingDetails = await MeetingIntegrationService.createMeeting({
+            title: formData.title,
+            start_time: formData.start_time,
+            start_date: formData.start_date,
+            duration_minutes: formData.duration_minutes,
+            description: formData.description,
+            instructor_email: instructor.contact_email || '',
+            provider: formData.meeting_provider as 'zoom' | 'google_meet'
+          });
+        } catch (meetingError) {
+          console.warn('Failed to create meeting automatically:', meetingError);
+          // Continue without meeting link rather than failing the entire class creation
+        }
       }
 
       const classData = {
-        title: formData.title,
-        description: formData.description,
-        category: finalCategory,
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        category: finalCategory.trim(),
         difficulty_level: formData.difficulty_level,
-        duration_minutes: formData.duration_minutes,
-        max_students: formData.max_students,
-        price_cents: formData.price_cents,
+        duration_minutes: Number(formData.duration_minutes),
+        max_students: Number(formData.max_students),
+        price_cents: Number(formData.price_cents),
         start_date: formData.start_date,
         start_time: formData.start_time,
         timezone: formData.timezone,
@@ -158,12 +227,13 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
         meeting_url: meetingDetails?.join_url || formData.meeting_url || null,
         meeting_id: meetingDetails?.meeting_id || null,
         meeting_password: meetingDetails?.password || null,
-        // Only set end_date if it's not empty and is_recurring is true
         end_date: formData.is_recurring && formData.end_date ? formData.end_date : null,
-        recurrence_days: formData.is_recurring ? formData.recurrence_days : null,
+        recurrence_days: formData.is_recurring && formData.recurrence_pattern === 'weekly' ? formData.recurrence_days : null,
         recurrence_pattern: formData.is_recurring ? formData.recurrence_pattern : null,
         is_recurring: formData.is_recurring,
       };
+
+      console.log('Submitting class data:', classData);
 
       if (editingClass) {
         updateClass({ id: editingClass.id, ...classData });
@@ -177,9 +247,8 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
       });
 
       onClose();
-      // Redirect to class schedule instead of dashboard
       navigate('/class-schedule');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Class creation error:', error);
       toast({
         title: "Error",
@@ -191,6 +260,11 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear error when user starts fixing it
+    if (formErrors[field]) {
+      setFormErrors(prev => ({ ...prev, [field]: '' }));
+    }
     
     if (field === 'category' && value === 'custom') {
       setShowCustomCategory(true);
@@ -208,7 +282,6 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
     handleInputChange('recurrence_days', updatedDays);
   };
 
-  // Function to clear the end date
   const clearEndDate = () => {
     handleInputChange('end_date', '');
   };
@@ -251,14 +324,15 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                 onChange={(e) => handleInputChange('title', e.target.value)}
                 placeholder="e.g., Morning Vinyasa Flow"
                 required
-                className="border-gray-300 focus:border-black focus:ring-black"
+                className={`border-gray-300 focus:border-black focus:ring-black ${formErrors.title ? 'border-red-500' : ''}`}
               />
+              {formErrors.title && <p className="text-red-500 text-xs">{formErrors.title}</p>}
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="category" className="text-sm font-medium text-black">Category*</Label>
               <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-                <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black bg-white">
+                <SelectTrigger className={`border-gray-300 focus:border-black focus:ring-black bg-white ${formErrors.category ? 'border-red-500' : ''}`}>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border border-gray-300 z-50">
@@ -267,6 +341,7 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                   ))}
                 </SelectContent>
               </Select>
+              {formErrors.category && <p className="text-red-500 text-xs">{formErrors.category}</p>}
             </div>
 
             {showCustomCategory && (
@@ -278,8 +353,9 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                   onChange={(e) => handleInputChange('custom_category', e.target.value)}
                   placeholder="Enter custom category name (e.g., Hot Yoga, Ashtanga, Restorative)"
                   required={formData.category === 'custom'}
-                  className="border-gray-300 focus:border-black focus:ring-black"
+                  className={`border-gray-300 focus:border-black focus:ring-black ${formErrors.custom_category ? 'border-red-500' : ''}`}
                 />
+                {formErrors.custom_category && <p className="text-red-500 text-xs">{formErrors.custom_category}</p>}
               </div>
             )}
 
@@ -306,9 +382,11 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                 type="date"
                 value={formData.start_date}
                 onChange={(e) => handleInputChange('start_date', e.target.value)}
+                min={getTodayDate()}
                 required
-                className="border-gray-300 focus:border-black focus:ring-black"
+                className={`border-gray-300 focus:border-black focus:ring-black ${formErrors.start_date ? 'border-red-500' : ''}`}
               />
+              {formErrors.start_date && <p className="text-red-500 text-xs">{formErrors.start_date}</p>}
             </div>
 
             <div className="space-y-2">
@@ -319,8 +397,9 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                 value={formData.start_time}
                 onChange={(e) => handleInputChange('start_time', e.target.value)}
                 required
-                className="border-gray-300 focus:border-black focus:ring-black"
+                className={`border-gray-300 focus:border-black focus:ring-black ${formErrors.start_time ? 'border-red-500' : ''}`}
               />
+              {formErrors.start_time && <p className="text-red-500 text-xs">{formErrors.start_time}</p>}
             </div>
 
             <div className="space-y-2">
@@ -329,12 +408,13 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                 id="duration"
                 type="number"
                 value={formData.duration_minutes}
-                onChange={(e) => handleInputChange('duration_minutes', parseInt(e.target.value))}
+                onChange={(e) => handleInputChange('duration_minutes', parseInt(e.target.value) || 60)}
                 min="15"
                 max="180"
                 required
-                className="border-gray-300 focus:border-black focus:ring-black"
+                className={`border-gray-300 focus:border-black focus:ring-black ${formErrors.duration_minutes ? 'border-red-500' : ''}`}
               />
+              {formErrors.duration_minutes && <p className="text-red-500 text-xs">{formErrors.duration_minutes}</p>}
             </div>
 
             <div className="space-y-2">
@@ -357,12 +437,13 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                 id="max_students"
                 type="number"
                 value={formData.max_students}
-                onChange={(e) => handleInputChange('max_students', parseInt(e.target.value))}
+                onChange={(e) => handleInputChange('max_students', parseInt(e.target.value) || 10)}
                 min="1"
                 max="50"
                 required
-                className="border-gray-300 focus:border-black focus:ring-black"
+                className={`border-gray-300 focus:border-black focus:ring-black ${formErrors.max_students ? 'border-red-500' : ''}`}
               />
+              {formErrors.max_students && <p className="text-red-500 text-xs">{formErrors.max_students}</p>}
             </div>
 
             <div className="space-y-2">
@@ -374,9 +455,10 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                 onChange={(e) => handleInputChange('price_cents', parseInt(e.target.value) || 0)}
                 min="0"
                 placeholder="0 for free class"
-                className="border-gray-300 focus:border-black focus:ring-black"
+                className={`border-gray-300 focus:border-black focus:ring-black ${formErrors.price_cents ? 'border-red-500' : ''}`}
               />
               <p className="text-xs text-gray-500">Enter price in cents (e.g., 2500 for $25.00)</p>
+              {formErrors.price_cents && <p className="text-red-500 text-xs">{formErrors.price_cents}</p>}
             </div>
           </div>
 
@@ -461,7 +543,7 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
 
                 {formData.recurrence_pattern === 'weekly' && (
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-black">Repeat on days</Label>
+                    <Label className="text-sm font-medium text-black">Repeat on days*</Label>
                     <div className="grid grid-cols-2 gap-2">
                       {daysOfWeek.map((day) => (
                         <div key={day.value} className="flex items-center space-x-2">
@@ -476,10 +558,10 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                         </div>
                       ))}
                     </div>
+                    {formErrors.recurrence_days && <p className="text-red-500 text-xs">{formErrors.recurrence_days}</p>}
                   </div>
                 )}
 
-                {/* Improved end date field with clear option */}
                 <div className="space-y-2">
                   <Label htmlFor="end_date" className="text-sm font-medium text-black">
                     Ends on [optional]
@@ -490,7 +572,8 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                       type="date"
                       value={formData.end_date}
                       onChange={(e) => handleInputChange('end_date', e.target.value)}
-                      className="border-gray-300 focus:border-black focus:ring-black flex-1"
+                      min={formData.start_date}
+                      className={`border-gray-300 focus:border-black focus:ring-black flex-1 ${formErrors.end_date ? 'border-red-500' : ''}`}
                     />
                     {formData.end_date && (
                       <Button
@@ -508,6 +591,7 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                     Enter the date on or before which you want the recurring classes to end. 
                     Leave empty if you want the recurring classes to continue forever.
                   </p>
+                  {formErrors.end_date && <p className="text-red-500 text-xs">{formErrors.end_date}</p>}
                 </div>
               </div>
             )}
@@ -529,6 +613,7 @@ const ClassForm = ({ onClose, editingClass }: ClassFormProps) => {
                 duration: formData.duration_minutes
               }}
             />
+            {formErrors.description && <p className="text-red-500 text-xs">{formErrors.description}</p>}
           </div>
 
           <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
