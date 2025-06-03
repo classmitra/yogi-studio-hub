@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useInstructor } from '@/hooks/useInstructor';
 import { useClasses } from '@/hooks/useClasses';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useScrollAnimations } from '@/hooks/useScrollAnimations';
 import DashboardHeader from './DashboardHeader';
 import StudioInfoCard from './StudioInfoCard';
@@ -12,6 +13,9 @@ import DashboardStats from './DashboardStats';
 import TodaysClasses from './TodaysClasses';
 import QuickActions from './QuickActions';
 import RecentActivity from './RecentActivity';
+import ParallaxContainer from '@/components/animations/ParallaxContainer';
+import ScrollReveal from '@/components/animations/ScrollReveal';
+import FloatingElement from '@/components/animations/FloatingElement';
 
 const EnhancedInstructorDashboard = () => {
   const { instructor, isLoading } = useInstructor();
@@ -25,12 +29,21 @@ const EnhancedInstructorDashboard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
+        <motion.div 
+          className="text-center"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="w-16 h-16 border border-black flex items-center justify-center mx-auto mb-8 breathe-minimal">
-            <div className="w-6 h-6 border border-black border-t-transparent animate-spin"></div>
+            <motion.div 
+              className="w-6 h-6 border border-black border-t-transparent"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            />
           </div>
-          <p className="text-black/70 text-lg font-light tracking-wide">Preparing your sacred space...</p>
-        </div>
+          <p className="text-black/70 text-lg font-light tracking-wide">Preparing your space...</p>
+        </motion.div>
       </div>
     );
   }
@@ -38,22 +51,27 @@ const EnhancedInstructorDashboard = () => {
   if (!instructor) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center max-w-md mx-auto p-8">
+        <motion.div 
+          className="text-center max-w-md mx-auto p-8"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="w-20 h-20 border border-black flex items-center justify-center mx-auto mb-8">
             <Settings className="h-10 w-10 text-black/60" />
           </div>
-          <h1 className="text-5xl font-dongle font-normal text-black mb-6 leading-none">Sacred Space Setup</h1>
+          <h1 className="text-5xl font-dongle font-normal text-black mb-6 leading-none">Studio Setup</h1>
           <p className="text-black/70 mb-12 leading-relaxed font-light tracking-wide">
-            Let's create your beautiful digital sanctuary before accessing your teaching dashboard.
+            Create your digital studio space before accessing your teaching dashboard.
           </p>
           <Button 
             onClick={() => navigate('/studio-setup')}
             className="minimal-button px-8 py-4 text-lg font-light tracking-wide"
           >
-            Create Sacred Space
+            Create Studio
             <ArrowRight className="h-5 w-5 ml-2" />
           </Button>
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -64,46 +82,67 @@ const EnhancedInstructorDashboard = () => {
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* Scroll Progress */}
-      <div className="scroll-progress-minimal"></div>
-
-      {/* Background Elements */}
+      {/* Background Elements with Parallax */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-20 w-1 h-48 bg-black/5 float-minimal"></div>
-        <div className="absolute bottom-32 right-32 w-1 h-32 bg-black/10 parallax-slow"></div>
-        <div className="absolute top-40 right-1/4 w-px h-64 bg-black/5 gentle-fade" />
-        <div className="absolute bottom-40 left-1/4 w-1 h-1 bg-black/20 breathe-minimal" />
+        <ParallaxContainer speed={0.3} className="absolute top-20 left-20">
+          <div className="w-1 h-48 bg-black/5" />
+        </ParallaxContainer>
+        
+        <ParallaxContainer speed={0.5} direction="down" className="absolute bottom-32 right-32">
+          <div className="w-1 h-32 bg-black/10" />
+        </ParallaxContainer>
+        
+        <ParallaxContainer speed={0.2} className="absolute top-40 right-1/4">
+          <div className="w-px h-64 bg-black/5" />
+        </ParallaxContainer>
+        
+        <FloatingElement intensity={5} duration={8} className="absolute bottom-40 left-1/4">
+          <div className="w-1 h-1 bg-black/20" />
+        </FloatingElement>
       </div>
 
       <div className="max-w-7xl mx-auto p-8 relative z-10">
-        {/* Header */}
-        <DashboardHeader instructor={instructor} />
+        {/* Header with enhanced animation */}
+        <ScrollReveal delay={0.1}>
+          <DashboardHeader instructor={instructor} />
+        </ScrollReveal>
 
-        {/* Sacred Studio Info Card */}
-        <StudioInfoCard instructor={instructor} />
+        {/* Studio Info Card */}
+        <ScrollReveal delay={0.2} direction="up">
+          <StudioInfoCard instructor={instructor} />
+        </ScrollReveal>
 
-        {/* Stats Grid */}
-        <DashboardStats classes={classes} />
+        {/* Stats Grid with staggered animations */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <DashboardStats classes={classes} />
+        </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-16">
-          {/* Today's Sacred Offerings */}
+          {/* Today's Classes */}
           <div className="lg:col-span-2">
-            <TodaysClasses 
-              classes={classes}
-              classesLoading={classesLoading}
-              todaysClasses={todaysClasses}
-            />
+            <ScrollReveal delay={0.4} direction="left">
+              <TodaysClasses 
+                classes={classes}
+                classesLoading={classesLoading}
+                todaysClasses={todaysClasses}
+              />
+            </ScrollReveal>
           </div>
 
-          {/* Sacred Actions & Energy */}
+          {/* Quick Actions & Activity */}
           <div className="space-y-12">
-            {/* Quick Actions */}
-            <div className="slide-up-minimal" style={{ animationDelay: '0.3s' }}>
+            <ScrollReveal delay={0.5} direction="right">
               <QuickActions />
-            </div>
+            </ScrollReveal>
 
-            {/* Sacred Energy Flow */}
-            <RecentActivity />
+            <ScrollReveal delay={0.6} direction="right">
+              <RecentActivity />
+            </ScrollReveal>
           </div>
         </div>
       </div>
