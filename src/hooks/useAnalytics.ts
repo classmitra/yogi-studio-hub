@@ -20,7 +20,10 @@ export const useAnalytics = () => {
       
       // Type guard to ensure data matches InstructorMetrics structure
       if (data && typeof data === 'object' && !Array.isArray(data)) {
-        return data as InstructorMetrics;
+        const obj = data as Record<string, any>;
+        if ('total_revenue' in obj && 'total_students' in obj && 'total_classes' in obj && 'avg_rating' in obj && 'recurring_students' in obj) {
+          return obj as InstructorMetrics;
+        }
       }
       
       return null;
