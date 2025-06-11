@@ -389,6 +389,7 @@ export type Database = {
           id: string
           is_instructor: boolean | null
           last_name: string | null
+          phone_number: string | null
           updated_at: string
         }
         Insert: {
@@ -399,6 +400,7 @@ export type Database = {
           id: string
           is_instructor?: boolean | null
           last_name?: string | null
+          phone_number?: string | null
           updated_at?: string
         }
         Update: {
@@ -409,6 +411,7 @@ export type Database = {
           id?: string
           is_instructor?: boolean | null
           last_name?: string | null
+          phone_number?: string | null
           updated_at?: string
         }
         Relationships: []

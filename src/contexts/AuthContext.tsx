@@ -9,6 +9,8 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithPhone: (phone: string) => Promise<{ error: any }>;
+  verifyOTP: (phone: string, token: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -31,7 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
+        console.log('Auth state changed:', event, session?.user?.email || session?.user?.phone);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -40,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session:', session?.user?.email);
+      console.log('Initial session:', session?.user?.email || session?.user?.phone);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -80,6 +82,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
+  const signInWithPhone = async (phone: string) => {
+    console.log('SignInWithPhone called with:', { phone });
+    const { error } = await supabase.auth.signInWithOtp({
+      phone: phone,
+    });
+    
+    console.log('SignInWithPhone result:', { error });
+    return { error };
+  };
+
+  const verifyOTP = async (phone: string, token: string) => {
+    console.log('VerifyOTP called with:', { phone, token });
+    const { error } = await supabase.auth.verifyOtp({
+      phone: phone,
+      token: token,
+      type: 'sms',
+    });
+    
+    console.log('VerifyOTP result:', { error });
+    return { error };
+  };
+
   const signOut = async () => {
     console.log('SignOut called');
     await supabase.auth.signOut();
@@ -91,6 +115,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     signUp,
     signIn,
+    signInWithPhone,
+    verifyOTP,
     signOut,
   };
 

@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackClassBooking } from '@/utils/analytics';
+import StudentPhoneAuth from './StudentPhoneAuth';
 
 interface StudentBookingFlowProps {
   classItem: any;
@@ -21,6 +22,7 @@ const StudentBookingFlow = ({ classItem, instructor, onClose }: StudentBookingFl
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bookingReference, setBookingReference] = useState<string | null>(null);
+  const [showPhoneAuth, setShowPhoneAuth] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -31,11 +33,8 @@ const StudentBookingFlow = ({ classItem, instructor, onClose }: StudentBookingFl
       
       // Check if user is authenticated
       if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "Please log in to book a class.",
-          variant: "destructive",
-        });
+        setShowPhoneAuth(true);
+        setIsLoading(false);
         return;
       }
 
@@ -104,95 +103,92 @@ const StudentBookingFlow = ({ classItem, instructor, onClose }: StudentBookingFl
     }
   };
 
-  // If user is not authenticated, show login prompt
-  if (!user) {
-    return (
+  const handlePhoneAuthSuccess = () => {
+    setShowPhoneAuth(false);
+    // After successful authentication, automatically proceed with booking
+    const formData = {
+      name: (document.getElementById('name') as HTMLInputElement)?.value || '',
+      email: (document.getElementById('email') as HTMLInputElement)?.value || '',
+      special_requests: (document.getElementById('special_requests') as HTMLTextAreaElement)?.value || ''
+    };
+    handleBookingSubmit(formData);
+  };
+
+  return (
+    <>
       <Dialog open onOpenChange={onClose}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Authentication Required</DialogTitle>
+            <DialogTitle>Book {classItem.title}</DialogTitle>
             <DialogDescription>
-              Please log in to book this class.
+              Complete your details to book this class.
             </DialogDescription>
           </DialogHeader>
+
+          {step === 'form' && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Name
+                </Label>
+                <Input 
+                  id="name" 
+                  defaultValue={user?.user_metadata?.full_name || `${user?.user_metadata?.first_name || ''} ${user?.user_metadata?.last_name || ''}`.trim()} 
+                  className="col-span-3" 
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="email" className="text-right">
+                  Email
+                </Label>
+                <Input 
+                  id="email" 
+                  defaultValue={user?.email || ''} 
+                  className="col-span-3" 
+                  type="email" 
+                />
+              </div>
+              <div className="grid grid-cols-4 items-start gap-4">
+                <Label htmlFor="special_requests" className="text-right mt-2">
+                  Special Requests
+                </Label>
+                <Textarea id="special_requests" className="col-span-3" />
+              </div>
+            </div>
+          )}
+
+          {step === 'success' && (
+            <div className="grid gap-4 py-4">
+              <div className="text-center">
+                <h3 className="text-lg font-semibold">Booking Confirmed!</h3>
+                <p>Your booking reference is: {bookingReference}</p>
+              </div>
+            </div>
+          )}
+
           <DialogFooter>
-            <Button onClick={onClose} variant="outline">Close</Button>
-            <Button onClick={() => window.location.href = '/auth'}>
-              Go to Login
-            </Button>
+            {step === 'form' && (
+              <Button onClick={() => handleBookingSubmit({ 
+                name: (document.getElementById('name') as HTMLInputElement)?.value,
+                email: (document.getElementById('email') as HTMLInputElement)?.value,
+                special_requests: (document.getElementById('special_requests') as HTMLTextAreaElement)?.value
+              })} disabled={isLoading}>
+                {isLoading ? 'Processing...' : user ? 'Submit Booking' : 'Login & Book'}
+              </Button>
+            )}
+            {step === 'success' && (
+              <Button onClick={onClose}>Close</Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    );
-  }
 
-  return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Book {classItem.title}</DialogTitle>
-          <DialogDescription>
-            Complete your details to book this class.
-          </DialogDescription>
-        </DialogHeader>
-
-        {step === 'form' && (
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input 
-                id="name" 
-                defaultValue={user.user_metadata?.full_name || `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim()} 
-                className="col-span-3" 
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
-                Email
-              </Label>
-              <Input 
-                id="email" 
-                defaultValue={user.email || ''} 
-                className="col-span-3" 
-                type="email" 
-              />
-            </div>
-            <div className="grid grid-cols-4 items-start gap-4">
-              <Label htmlFor="special_requests" className="text-right mt-2">
-                Special Requests
-              </Label>
-              <Textarea id="special_requests" className="col-span-3" />
-            </div>
-          </div>
-        )}
-
-        {step === 'success' && (
-          <div className="grid gap-4 py-4">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold">Booking Confirmed!</h3>
-              <p>Your booking reference is: {bookingReference}</p>
-            </div>
-          </div>
-        )}
-
-        <DialogFooter>
-          {step === 'form' && (
-            <Button onClick={() => handleBookingSubmit({ 
-              name: (document.getElementById('name') as HTMLInputElement)?.value,
-              email: (document.getElementById('email') as HTMLInputElement)?.value,
-              special_requests: (document.getElementById('special_requests') as HTMLTextAreaElement)?.value
-            })} disabled={isLoading}>
-              {isLoading ? 'Submitting...' : 'Submit'}
-            </Button>
-          )}
-          {step === 'success' && (
-            <Button onClick={onClose}>Close</Button>
-          )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <StudentPhoneAuth
+        open={showPhoneAuth}
+        onClose={() => setShowPhoneAuth(false)}
+        onSuccess={handlePhoneAuthSuccess}
+      />
+    </>
   );
 };
 
